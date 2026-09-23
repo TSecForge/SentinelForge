@@ -1,0 +1,18 @@
+id: DET-DOCKER-003
+name: Privileged Container Started
+description: A container was started with --privileged, which removes most isolation from the host.
+version: "1.0"
+author: Sujhal Gurav
+source: builtin
+platform: docker
+event_type: container_start
+severity: high
+fidelity: high
+category: container
+selection:
+  container.privileged: true
+summary: "Privileged container '{container.name}' ({container.image}) started on {host}"
+mitre: {tactic: privilege-escalation, technique: T1611}
+tags: [docker, container, privilege]
+false_positives:
+  - Infrastructure containers (monitoring agents, CNI) that genuinely need privileges

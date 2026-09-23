@@ -1,0 +1,24 @@
+id: DET-WIN-010
+name: PowerShell Downloading Remote Content
+description: >
+  PowerShell command line contains a download primitive (Net.WebClient, Invoke-WebRequest,
+  Invoke-RestMethod, Start-BitsTransfer, DownloadString/DownloadFile).
+version: "1.0"
+author: Sujhal Gurav
+source: builtin
+platform: windows
+event_type: process_creation
+severity: high
+fidelity: medium
+category: powershell
+applies_when:
+  technologies: [PowerShell]
+selection:
+  process.name: [powershell.exe, pwsh.exe]
+condition:
+  process.command_line|re: '(downloadstring|downloadfile|downloaddata|invoke-webrequest|\biwr\b|invoke-restmethod|\birm\b|net\.webclient|start-bitstransfer|\bwget\b|\bcurl\b)'
+summary: "PowerShell download activity on {host} (parent {process.parent_name})"
+mitre: {tactic: command-and-control, technique: T1105}
+tags: [windows, powershell, download]
+false_positives:
+  - Admin scripts that fetch updates from internal repositories

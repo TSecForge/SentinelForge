@@ -1,0 +1,25 @@
+id: DET-NET-003
+name: Repeated Connection Attempts
+description: >
+  Fifteen or more blocked/failed inbound connection attempts from one source within 60 seconds,
+  consistent with scanning.
+version: "1.0"
+author: Sujhal Gurav
+source: builtin
+platform: network
+event_type: network_connection
+severity: medium
+fidelity: medium
+category: network
+selection:
+  network.direction: inbound
+  network.outcome: [blocked, failed, refused]
+threshold:
+  count: 15
+  window_seconds: 60
+  group_by: [host, network.src_ip]
+summary: "Repeated connection attempts to {host} from {network.src_ip}"
+mitre: {tactic: discovery, technique: T1046}
+tags: [network, scanning]
+false_positives:
+  - Authorized vulnerability scanners (allowlist their addresses)

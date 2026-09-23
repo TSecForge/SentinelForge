@@ -1,0 +1,23 @@
+id: DET-NET-001
+name: Outbound Connection to Unusual Destination
+description: >
+  Outbound connection to an address outside the host's internal ranges on a port that is not a
+  common web/DNS/NTP/mail port.
+version: "1.0"
+author: Sujhal Gurav
+source: builtin
+platform: network
+event_type: network_connection
+severity: low
+fidelity: low
+category: network
+selection:
+  network.direction: outbound
+  network.dst_ip|not_cidr: $profile.internal_cidrs
+condition:
+  network.dst_port|not_in: [80, 443, 53, 123, 587, 993, 853]
+summary: "{process.name} on {host} connected to {network.dst_ip}:{network.dst_port}"
+mitre: {tactic: command-and-control, technique: T1571}
+tags: [network, egress]
+false_positives:
+  - SaaS agents using non-standard ports

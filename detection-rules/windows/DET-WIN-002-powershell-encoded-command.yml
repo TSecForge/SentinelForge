@@ -1,0 +1,24 @@
+id: DET-WIN-002
+name: PowerShell Encoded Command
+description: >
+  PowerShell was started with -EncodedCommand (or an abbreviation such as -enc / -e) followed by a
+  Base64 blob. Encoding is frequently used to hide script content from command-line logging.
+version: "1.0"
+author: Sujhal Gurav
+source: builtin
+platform: windows
+event_type: process_creation
+severity: high
+fidelity: medium
+category: powershell
+applies_when:
+  technologies: [PowerShell]
+selection:
+  process.name: [powershell.exe, pwsh.exe]
+condition:
+  process.command_line|re: '\s[-/]e(c|n[a-z]*)?\s+[A-Za-z0-9+/=]{20,}'
+summary: "Encoded PowerShell command on {host} launched by {process.parent_name}"
+mitre: {tactic: execution, technique: T1059.001}
+tags: [windows, powershell, obfuscation]
+false_positives:
+  - Some management agents and installers use -EncodedCommand legitimately

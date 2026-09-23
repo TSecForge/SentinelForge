@@ -1,0 +1,90 @@
+{
+  "_comment": "SYNTHETIC sample events for SentinelForge (simulated=true). POST this file to /api/v1/events/batch after creating the WEB-SRV-01 demo environment.",
+  "events": [
+    {
+      "source": "docker",
+      "simulated": true,
+      "data": {
+        "event_id": "sample-docker-web-proxy-2",
+        "host": "WEB-SRV-01",
+        "Type": "container",
+        "Action": "start",
+        "time": 1790159400,
+        "Actor": {
+          "ID": "7765622d70726f78792d327765622d70726f78792d327765622d70726f78792d",
+          "Attributes": {
+            "image": "nginx:1.25",
+            "name": "web-proxy-2"
+          }
+        },
+        "host_ports": [
+          8443
+        ],
+        "privileged": false
+      }
+    },
+    {
+      "source": "docker",
+      "simulated": true,
+      "data": {
+        "event_id": "sample-docker-debug-shell",
+        "host": "WEB-SRV-01",
+        "Type": "container",
+        "Action": "start",
+        "time": 1790159460,
+        "Actor": {
+          "ID": "64656275672d7368656c6c64656275672d7368656c6c64656275672d7368656c",
+          "Attributes": {
+            "image": "registry.example.net/tools/netshell:latest",
+            "name": "debug-shell"
+          }
+        },
+        "host_ports": [],
+        "privileged": false
+      }
+    },
+    {
+      "source": "docker",
+      "simulated": true,
+      "data": {
+        "event_id": "sample-docker-web-temp",
+        "host": "WEB-SRV-01",
+        "Type": "container",
+        "Action": "start",
+        "time": 1790159520,
+        "Actor": {
+          "ID": "7765622d74656d707765622d74656d707765622d74656d707765622d74656d70",
+          "Attributes": {
+            "image": "nginx:1.25",
+            "name": "web-temp"
+          }
+        },
+        "host_ports": [
+          2375,
+          4444
+        ],
+        "privileged": false
+      }
+    },
+    {
+      "source": "docker",
+      "simulated": true,
+      "data": {
+        "event_id": "sample-docker-cache-priv",
+        "host": "WEB-SRV-01",
+        "Type": "container",
+        "Action": "start",
+        "time": 1790159580,
+        "Actor": {
+          "ID": "63616368652d7072697663616368652d7072697663616368652d707269766361",
+          "Attributes": {
+            "image": "redis:7.2-alpine",
+            "name": "cache-priv"
+          }
+        },
+        "host_ports": [],
+        "privileged": true
+      }
+    }
+  ]
+}

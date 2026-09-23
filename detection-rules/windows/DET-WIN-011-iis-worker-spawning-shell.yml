@@ -1,0 +1,24 @@
+id: DET-WIN-011
+name: IIS Worker Process Spawning a Shell
+description: >
+  The IIS worker process (w3wp.exe) started a command shell, PowerShell or reconnaissance tool. Web
+  applications rarely need to do this; it is a classic web-shell indicator.
+version: "1.0"
+author: Sujhal Gurav
+source: builtin
+platform: windows
+event_type: process_creation
+severity: critical
+fidelity: high
+category: web_iis
+applies_when:
+  technologies: [IIS]
+selection:
+  process.parent_name: w3wp.exe
+condition:
+  process.name: [cmd.exe, powershell.exe, pwsh.exe, cscript.exe, wscript.exe, whoami.exe, net.exe, net1.exe, certutil.exe, rundll32.exe, systeminfo.exe]
+summary: "w3wp.exe spawned {process.name} on {host}: {process.command_line}"
+mitre: {tactic: persistence, technique: T1505.003}
+tags: [windows, iis, web-shell]
+false_positives:
+  - Legacy web applications that shell out by design (allowlist the exact command)

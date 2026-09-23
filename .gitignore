@@ -1,3 +1,33 @@
+# secrets / local config
+.env
+.env.*
+!.env.example
+
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+*.db
+*.db-journal
+
+# node
+node_modules/
+frontend/dist/
+
+# local tooling / scratch
+.scratch/
+.claude/
+.idea/
+.vscode/
+*.log
+
+# discovery output from real hosts can contain sensitive inventory - keep it out of git
+inventory*.json
+
+# --- GitHub Python template (from initial repo commit) ---
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

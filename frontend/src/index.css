@@ -1,0 +1,34 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink-950: #070b14;
+  --color-ink-900: #0b1120;
+  --color-ink-850: #0f1628;
+  --color-ink-800: #131c31;
+  --color-ink-700: #1e293b;
+  --color-ink-600: #2b3a55;
+  --font-mono: "JetBrains Mono", "Cascadia Code", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+:root {
+  --brand: #38bdf8; /* overridden at runtime from PRIMARY_BRAND_COLOR */
+  color-scheme: dark;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  @apply bg-ink-950 text-slate-200 antialiased;
+  font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+.text-brand { color: var(--brand); }
+.bg-brand { background-color: var(--brand); }
+.border-brand { border-color: var(--brand); }
+.ring-brand { --tw-ring-color: var(--brand); }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 6px; }
+::-webkit-scrollbar-track { background: transparent; }

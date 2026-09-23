@@ -1,0 +1,68 @@
+{
+  "_comment": "SYNTHETIC sample inventory for SentinelForge demo mode. Not a real host.",
+  "schema_version": "1.0",
+  "collection_time": "2026-09-23T10:05:00Z",
+  "collector": {"name": "sentinelforge-windows-discovery", "version": "1.0.0", "mode": "simulated"},
+  "simulated": true,
+  "host": {
+    "hostname": "WKS-042",
+    "platform": "windows",
+    "os": "Microsoft Windows 11 Enterprise",
+    "os_version": "10.0.22631",
+    "build": "22631",
+    "architecture": "64-bit",
+    "domain": "corp.example",
+    "part_of_domain": true,
+    "boot_time": "2026-09-23T07:45:00Z",
+    "uptime_seconds": 8100
+  },
+  "network": {
+    "interfaces": [
+      {"name": "Wi-Fi", "description": "Intel(R) Wi-Fi 6E AX211", "mac": "00-1B-21-00-04-42", "status": "Up",
+       "ipv4": [{"address": "10.10.50.42", "prefix_length": 24}],
+       "ipv6": [{"address": "fd00:10:50::42", "prefix_length": 64}],
+       "gateways": ["10.10.50.1"], "dns_servers": ["10.10.30.8"]}
+    ],
+    "routes": [
+      {"destination": "0.0.0.0/0", "next_hop": "10.10.50.1", "interface": "Wi-Fi", "metric": 35}
+    ],
+    "listening_ports": [
+      {"protocol": "tcp", "address": "0.0.0.0", "port": 135, "pid": 1012, "process": "svchost"},
+      {"protocol": "tcp", "address": "0.0.0.0", "port": 445, "pid": 4, "process": "System"},
+      {"protocol": "tcp", "address": "127.0.0.1", "port": 5939, "pid": 4410, "process": "TeamsHelper"},
+      {"protocol": "udp", "address": "0.0.0.0", "port": 5353, "pid": 2240, "process": "chrome"}
+    ]
+  },
+  "services": [
+    {"name": "WinRM", "display_name": "Windows Remote Management (WS-Management)", "status": "Stopped", "start_type": "Manual", "path": "C:\\Windows\\System32\\svchost.exe -k NetworkService -p"},
+    {"name": "TermService", "display_name": "Remote Desktop Services", "status": "Stopped", "start_type": "Manual", "path": "C:\\Windows\\System32\\svchost.exe -k NetworkService"},
+    {"name": "WinDefend", "display_name": "Microsoft Defender Antivirus Service", "status": "Running", "start_type": "Auto", "path": "MsMpEng.exe"},
+    {"name": "MpsSvc", "display_name": "Windows Defender Firewall", "status": "Running", "start_type": "Auto", "path": "C:\\Windows\\system32\\svchost.exe -k LocalServiceNoNetworkFirewall -p"}
+  ],
+  "processes": [
+    {"name": "explorer.exe", "pid": 5120, "parent_pid": 5004, "path": "C:\\Windows\\explorer.exe", "command_line": "C:\\Windows\\Explorer.EXE"},
+    {"name": "WINWORD.EXE", "pid": 7720, "parent_pid": 5120, "path": "C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE", "command_line": "\"WINWORD.EXE\" /n"},
+    {"name": "OUTLOOK.EXE", "pid": 7810, "parent_pid": 5120, "path": "C:\\Program Files\\Microsoft Office\\root\\Office16\\OUTLOOK.EXE", "command_line": "\"OUTLOOK.EXE\""},
+    {"name": "chrome.exe", "pid": 2240, "parent_pid": 5120, "path": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe", "command_line": "chrome.exe"}
+  ],
+  "users": [
+    {"name": "Administrator", "enabled": false, "is_admin": true, "last_logon": ""},
+    {"name": "it-local", "enabled": true, "is_admin": true, "last_logon": "2026-08-30T12:00:00Z"}
+  ],
+  "admin_group_members": ["WKS-042\\Administrator", "WKS-042\\it-local", "CORP\\Domain Admins"],
+  "software": [
+    {"name": "Microsoft 365 Apps for enterprise - en-us", "version": "16.0.17928.20156", "publisher": "Microsoft Corporation"},
+    {"name": "Google Chrome", "version": "129.0.6668.59", "publisher": "Google LLC"},
+    {"name": "Microsoft Teams", "version": "24215.1007.3082.1590", "publisher": "Microsoft Corporation"}
+  ],
+  "scheduled_tasks": [],
+  "security": {
+    "defender": {"antivirus_enabled": true, "realtime_enabled": true, "tamper_protected": true, "signature_last_updated": "2026-09-23T06:00:00Z"},
+    "firewall_profiles": [{"name": "Domain", "enabled": true}, {"name": "Private", "enabled": true}, {"name": "Public", "enabled": false}],
+    "audit_policy": {"Process Creation": "Success", "Logon": "Success and Failure"},
+    "security_services": ["WinDefend=Running", "MpsSvc=Running"]
+  },
+  "remote_access": {"rdp_enabled": false, "rdp_port": 3389, "winrm_enabled": false, "ssh_present": false},
+  "web_servers": {"iis": false, "apache": false, "nginx": false, "iis_sites": []},
+  "containers": {"docker": false, "docker_service_status": "", "containers": [], "images": [], "kubernetes": false, "kubernetes_indicators": []}
+}

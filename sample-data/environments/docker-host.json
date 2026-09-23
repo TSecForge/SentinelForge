@@ -1,0 +1,69 @@
+{
+  "_comment": "SYNTHETIC sample inventory (Linux Docker host) for SentinelForge demo mode. Not a real host.",
+  "schema_version": "1.0",
+  "collection_time": "2026-09-23T10:10:00Z",
+  "collector": {"name": "sentinelforge-linux-discovery", "version": "0.1.0", "mode": "simulated"},
+  "simulated": true,
+  "host": {
+    "hostname": "DOCKER-01",
+    "platform": "linux",
+    "os": "Ubuntu 22.04.4 LTS",
+    "os_version": "5.15.0-119-generic",
+    "build": "",
+    "architecture": "x86_64",
+    "domain": "",
+    "part_of_domain": false,
+    "boot_time": "2026-09-10T03:00:00Z",
+    "uptime_seconds": 1148400
+  },
+  "network": {
+    "interfaces": [
+      {"name": "ens160", "description": "VMware VMXNET3", "mac": "00:50:56:00:60:21", "status": "Up",
+       "ipv4": [{"address": "10.10.60.21", "prefix_length": 24}], "ipv6": [], "gateways": ["10.10.60.1"], "dns_servers": ["10.10.30.8"]},
+      {"name": "docker0", "description": "Docker bridge", "mac": "02:42:ac:11:00:01", "status": "Up",
+       "ipv4": [{"address": "172.17.0.1", "prefix_length": 16}], "ipv6": [], "gateways": [], "dns_servers": []}
+    ],
+    "routes": [
+      {"destination": "0.0.0.0/0", "next_hop": "10.10.60.1", "interface": "ens160", "metric": 100},
+      {"destination": "172.17.0.0/16", "next_hop": "0.0.0.0", "interface": "docker0", "metric": 0}
+    ],
+    "listening_ports": [
+      {"protocol": "tcp", "address": "0.0.0.0", "port": 22, "pid": 812, "process": "sshd"},
+      {"protocol": "tcp", "address": "0.0.0.0", "port": 80, "pid": 1502, "process": "docker-proxy"},
+      {"protocol": "tcp", "address": "0.0.0.0", "port": 443, "pid": 1511, "process": "docker-proxy"},
+      {"protocol": "tcp", "address": "0.0.0.0", "port": 5432, "pid": 1520, "process": "docker-proxy"},
+      {"protocol": "tcp", "address": "127.0.0.1", "port": 9090, "pid": 1530, "process": "docker-proxy"}
+    ]
+  },
+  "services": [
+    {"name": "ssh", "display_name": "OpenBSD Secure Shell server", "status": "Running", "start_type": "enabled", "path": "/usr/sbin/sshd -D"},
+    {"name": "docker", "display_name": "Docker Application Container Engine", "status": "Running", "start_type": "enabled", "path": "/usr/bin/dockerd -H fd://"},
+    {"name": "containerd", "display_name": "containerd container runtime", "status": "Running", "start_type": "enabled", "path": "/usr/bin/containerd"}
+  ],
+  "processes": [
+    {"name": "sshd", "pid": 812, "parent_pid": 1, "path": "/usr/sbin/sshd", "command_line": "sshd: /usr/sbin/sshd -D"},
+    {"name": "dockerd", "pid": 1102, "parent_pid": 1, "path": "/usr/bin/dockerd", "command_line": "/usr/bin/dockerd -H fd://"}
+  ],
+  "users": [
+    {"name": "root", "enabled": true, "is_admin": true},
+    {"name": "deploy", "enabled": true, "is_admin": true}
+  ],
+  "admin_group_members": ["root", "deploy"],
+  "software": [{"name": "docker-ce", "version": "5:27.2.1-1~ubuntu.22.04~jammy", "publisher": "Docker Inc."}],
+  "scheduled_tasks": [],
+  "security": {"defender": {}, "firewall_profiles": [{"name": "ufw", "enabled": true}], "audit_policy": {}, "security_services": ["auditd=Running"]},
+  "remote_access": {"rdp_enabled": false, "rdp_port": null, "winrm_enabled": false, "ssh_present": true},
+  "web_servers": {"iis": false, "apache": false, "nginx": true, "iis_sites": []},
+  "containers": {
+    "docker": true,
+    "docker_service_status": "Running",
+    "containers": [
+      {"id": "a1b2c3d4e5f6", "name": "edge", "image": "nginx:1.25", "ports": ["0.0.0.0:80->80/tcp", "0.0.0.0:443->443/tcp"], "status": "running"},
+      {"id": "b2c3d4e5f6a7", "name": "db", "image": "postgres:16.4", "ports": ["0.0.0.0:5432->5432/tcp"], "status": "running"},
+      {"id": "c3d4e5f6a7b8", "name": "prometheus", "image": "prom/prometheus:v2.54.1", "ports": ["127.0.0.1:9090->9090/tcp"], "status": "running"}
+    ],
+    "images": ["nginx:1.25", "postgres:16.4", "prom/prometheus:v2.54.1"],
+    "kubernetes": false,
+    "kubernetes_indicators": []
+  }
+}

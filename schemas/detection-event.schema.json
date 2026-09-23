@@ -1,0 +1,221 @@
+{
+  "$defs": {
+    "MitreRef": {
+      "properties": {
+        "tactic": {
+          "title": "Tactic",
+          "type": "string"
+        },
+        "technique": {
+          "title": "Technique",
+          "type": "string"
+        }
+      },
+      "required": [
+        "tactic",
+        "technique"
+      ],
+      "title": "MitreRef",
+      "type": "object"
+    },
+    "ObservableOut": {
+      "properties": {
+        "type": {
+          "enum": [
+            "ipv4",
+            "ipv6",
+            "domain",
+            "url",
+            "file_path",
+            "hash_md5",
+            "hash_sha1",
+            "hash_sha256",
+            "process",
+            "command_line",
+            "user",
+            "hostname",
+            "container_image",
+            "port"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "string"
+        },
+        "context": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Context"
+        }
+      },
+      "required": [
+        "type",
+        "value"
+      ],
+      "title": "ObservableOut",
+      "type": "object"
+    },
+    "RuleRef": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        },
+        "source": {
+          "title": "Source",
+          "type": "string"
+        },
+        "author": {
+          "title": "Author",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "version",
+        "source",
+        "author"
+      ],
+      "title": "RuleRef",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "schema": {
+      "const": "sentinelforge.detection.v1",
+      "default": "sentinelforge.detection.v1",
+      "title": "Schema",
+      "type": "string"
+    },
+    "detection_id": {
+      "title": "Detection Id",
+      "type": "string"
+    },
+    "timestamp": {
+      "format": "date-time",
+      "title": "Timestamp",
+      "type": "string"
+    },
+    "host": {
+      "title": "Host",
+      "type": "string"
+    },
+    "rule": {
+      "$ref": "#/$defs/RuleRef"
+    },
+    "severity": {
+      "enum": [
+        "informational",
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "title": "Severity",
+      "type": "string"
+    },
+    "confidence": {
+      "maximum": 1,
+      "minimum": 0,
+      "title": "Confidence",
+      "type": "number"
+    },
+    "confidence_basis": {
+      "title": "Confidence Basis",
+      "type": "string"
+    },
+    "event_type": {
+      "title": "Event Type",
+      "type": "string"
+    },
+    "description": {
+      "title": "Description",
+      "type": "string"
+    },
+    "summary": {
+      "title": "Summary",
+      "type": "string"
+    },
+    "mitre": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/MitreRef"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "observables": {
+      "items": {
+        "$ref": "#/$defs/ObservableOut"
+      },
+      "title": "Observables",
+      "type": "array"
+    },
+    "evidence": {
+      "additionalProperties": true,
+      "title": "Evidence",
+      "type": "object"
+    },
+    "context": {
+      "additionalProperties": true,
+      "title": "Context",
+      "type": "object"
+    },
+    "source": {
+      "additionalProperties": true,
+      "title": "Source",
+      "type": "object"
+    },
+    "simulated": {
+      "title": "Simulated",
+      "type": "boolean"
+    },
+    "event": {
+      "additionalProperties": true,
+      "title": "Event",
+      "type": "object"
+    }
+  },
+  "required": [
+    "detection_id",
+    "timestamp",
+    "host",
+    "rule",
+    "severity",
+    "confidence",
+    "confidence_basis",
+    "event_type",
+    "description",
+    "summary",
+    "observables",
+    "evidence",
+    "context",
+    "source",
+    "simulated",
+    "event"
+  ],
+  "title": "DetectionEvent",
+  "type": "object",
+  "$id": "https://sentinelforge.dev/schemas/detection-event.schema.json"
+}

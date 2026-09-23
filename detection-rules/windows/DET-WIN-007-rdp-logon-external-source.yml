@@ -1,0 +1,25 @@
+id: DET-WIN-007
+name: RDP Logon From Outside Internal Ranges
+description: >
+  A successful RemoteInteractive (RDP, logon type 10) logon came from an address outside the host's
+  internal ranges (discovered interface subnets plus RFC1918).
+version: "1.0"
+author: Sujhal Gurav
+source: builtin
+platform: windows
+event_type: authentication
+severity: high
+fidelity: medium
+category: remote_access
+applies_when:
+  technologies: [RDP]
+selection:
+  auth.outcome: success
+  auth.logon_type: 10
+condition:
+  network.src_ip|not_cidr: $profile.internal_cidrs
+summary: "RDP logon as {actor.user} on {host} from {network.src_ip}"
+mitre: {tactic: lateral-movement, technique: T1021.001}
+tags: [windows, rdp, remote-access]
+false_positives:
+  - Remote staff connecting over a VPN that does not NAT into internal ranges

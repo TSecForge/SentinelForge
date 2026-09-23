@@ -1,0 +1,24 @@
+id: DET-WIN-001
+name: Office Application Spawning PowerShell
+description: >
+  A Microsoft Office application started PowerShell. Documents launching script interpreters are a
+  common initial-access pattern (malicious macros, embedded OLE objects).
+version: "1.0"
+author: Sujhal Gurav
+source: builtin
+platform: windows
+event_type: process_creation
+severity: high
+fidelity: high
+category: powershell
+applies_when:
+  technologies: [PowerShell]
+selection:
+  process.name: [powershell.exe, pwsh.exe, powershell_ise.exe]
+condition:
+  process.parent_name: [winword.exe, excel.exe, powerpnt.exe, outlook.exe, msaccess.exe, mspub.exe, onenote.exe, visio.exe]
+summary: "{process.parent_name} spawned {process.name} on {host} (user {actor.user})"
+mitre: {tactic: execution, technique: T1059.001}
+tags: [windows, powershell, office, execution]
+false_positives:
+  - Office add-ins that legitimately shell out to PowerShell (rare - baseline and tune)

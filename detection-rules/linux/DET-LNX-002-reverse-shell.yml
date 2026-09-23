@@ -1,0 +1,20 @@
+id: DET-LNX-002
+name: Reverse Shell Command Pattern
+description: A command line contains a well-known reverse-shell construct (/dev/tcp redirection, nc -e, socat exec).
+version: "1.0"
+author: Sujhal Gurav
+source: builtin
+platform: linux
+event_type: process_creation
+severity: critical
+fidelity: high
+category: linux_process
+selection:
+  process.command_line|re:
+    - '/dev/tcp/'
+    - 'nc(at)?\s+.*-e\s+/bin/(ba)?sh'
+    - 'bash\s+-i\s+>&'
+    - 'socat\s+.*exec:'
+summary: "Reverse shell pattern on {host} (parent {process.parent_name}): {process.command_line}"
+mitre: {tactic: execution, technique: T1059.004}
+tags: [linux, reverse-shell]

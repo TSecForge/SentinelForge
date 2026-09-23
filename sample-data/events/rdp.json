@@ -1,0 +1,151 @@
+{
+  "_comment": "SYNTHETIC sample events for SentinelForge (simulated=true). POST this file to /api/v1/events/batch after creating the WEB-SRV-01 demo environment.",
+  "events": [
+    {
+      "source": "windows",
+      "simulated": true,
+      "data": {
+        "event_id": "sample-4624-2026-09-23T10:30:00Z-0",
+        "EventID": 4624,
+        "Channel": "Security",
+        "Computer": "WEB-SRV-01",
+        "TimeCreated": "2026-09-23T10:30:00Z",
+        "EventData": {
+          "TargetUserName": "administrator",
+          "TargetDomainName": "WEB-SRV-01",
+          "LogonType": 10,
+          "IpAddress": "203.0.113.50",
+          "IpPort": 51515,
+          "AuthenticationPackageName": "Negotiate"
+        }
+      }
+    },
+    {
+      "source": "windows",
+      "simulated": true,
+      "data": {
+        "event_id": "sample-4624-2026-09-23T10:31:00Z-0",
+        "EventID": 4624,
+        "Channel": "Security",
+        "Computer": "WEB-SRV-01",
+        "TimeCreated": "2026-09-23T10:31:00Z",
+        "EventData": {
+          "TargetUserName": "jdoe",
+          "TargetDomainName": "CORP",
+          "LogonType": 10,
+          "IpAddress": "10.10.20.50",
+          "IpPort": 50100,
+          "AuthenticationPackageName": "Kerberos"
+        }
+      }
+    },
+    {
+      "source": "windows",
+      "simulated": true,
+      "data": {
+        "event_id": "sample-4625-2026-09-23T10:32:00Z-0",
+        "EventID": 4625,
+        "Channel": "Security",
+        "Computer": "WEB-SRV-01",
+        "TimeCreated": "2026-09-23T10:32:00Z",
+        "EventData": {
+          "TargetUserName": "administrator",
+          "TargetDomainName": "WEB-SRV-01",
+          "LogonType": 10,
+          "IpAddress": "203.0.113.77",
+          "IpPort": 52000
+        }
+      }
+    },
+    {
+      "source": "windows",
+      "simulated": true,
+      "data": {
+        "event_id": "sample-4625-2026-09-23T10:32:10Z-1",
+        "EventID": 4625,
+        "Channel": "Security",
+        "Computer": "WEB-SRV-01",
+        "TimeCreated": "2026-09-23T10:32:10Z",
+        "EventData": {
+          "TargetUserName": "administrator",
+          "TargetDomainName": "WEB-SRV-01",
+          "LogonType": 10,
+          "IpAddress": "203.0.113.77",
+          "IpPort": 52001
+        }
+      }
+    },
+    {
+      "source": "windows",
+      "simulated": true,
+      "data": {
+        "event_id": "sample-4625-2026-09-23T10:32:20Z-2",
+        "EventID": 4625,
+        "Channel": "Security",
+        "Computer": "WEB-SRV-01",
+        "TimeCreated": "2026-09-23T10:32:20Z",
+        "EventData": {
+          "TargetUserName": "administrator",
+          "TargetDomainName": "WEB-SRV-01",
+          "LogonType": 10,
+          "IpAddress": "203.0.113.77",
+          "IpPort": 52002
+        }
+      }
+    },
+    {
+      "source": "windows",
+      "simulated": true,
+      "data": {
+        "event_id": "sample-4625-2026-09-23T10:32:30Z-3",
+        "EventID": 4625,
+        "Channel": "Security",
+        "Computer": "WEB-SRV-01",
+        "TimeCreated": "2026-09-23T10:32:30Z",
+        "EventData": {
+          "TargetUserName": "administrator",
+          "TargetDomainName": "WEB-SRV-01",
+          "LogonType": 10,
+          "IpAddress": "203.0.113.77",
+          "IpPort": 52003
+        }
+      }
+    },
+    {
+      "source": "windows",
+      "simulated": true,
+      "data": {
+        "event_id": "sample-4625-2026-09-23T10:32:40Z-4",
+        "EventID": 4625,
+        "Channel": "Security",
+        "Computer": "WEB-SRV-01",
+        "TimeCreated": "2026-09-23T10:32:40Z",
+        "EventData": {
+          "TargetUserName": "administrator",
+          "TargetDomainName": "WEB-SRV-01",
+          "LogonType": 10,
+          "IpAddress": "203.0.113.77",
+          "IpPort": 52004
+        }
+      }
+    },
+    {
+      "source": "windows",
+      "simulated": true,
+      "data": {
+        "event_id": "sample-4625-2026-09-23T10:32:50Z-5",
+        "EventID": 4625,
+        "Channel": "Security",
+        "Computer": "WEB-SRV-01",
+        "TimeCreated": "2026-09-23T10:32:50Z",
+        "EventData": {
+          "TargetUserName": "administrator",
+          "TargetDomainName": "WEB-SRV-01",
+          "LogonType": 10,
+          "IpAddress": "203.0.113.77",
+          "IpPort": 52005
+        }
+      }
+    }
+  ]
+}

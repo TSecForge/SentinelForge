@@ -1,0 +1,23 @@
+id: DET-LNX-001
+name: SSH Password Guessing
+description: Five or more failed SSH logins from the same source within five minutes.
+version: "1.0"
+author: Sujhal Gurav
+source: builtin
+platform: linux
+event_type: authentication
+severity: medium
+fidelity: medium
+category: authentication
+applies_when:
+  technologies: [SSH]
+selection:
+  auth.outcome: failure
+  auth.method: ssh
+threshold:
+  count: 5
+  window_seconds: 300
+  group_by: [host, network.src_ip]
+summary: "Repeated SSH failures on {host} from {network.src_ip} (user {actor.user})"
+mitre: {tactic: credential-access, technique: T1110.001}
+tags: [linux, ssh, brute-force]

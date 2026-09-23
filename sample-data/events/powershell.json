@@ -1,0 +1,63 @@
+{
+  "_comment": "SYNTHETIC sample events for SentinelForge (simulated=true). POST this file to /api/v1/events/batch after creating the WEB-SRV-01 demo environment.",
+  "events": [
+    {
+      "source": "windows",
+      "simulated": true,
+      "data": {
+        "event_id": "sample-1-2026-09-23T10:22:11Z-0",
+        "EventID": 1,
+        "Channel": "Microsoft-Windows-Sysmon/Operational",
+        "Computer": "WEB-SRV-01",
+        "TimeCreated": "2026-09-23T10:22:11Z",
+        "EventData": {
+          "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+          "CommandLine": "powershell.exe -nop -w hidden -c Get-Process",
+          "ParentImage": "C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE",
+          "User": "CORP\\jdoe",
+          "ProcessId": 4212,
+          "ParentProcessId": 3120
+        }
+      }
+    },
+    {
+      "source": "windows",
+      "simulated": true,
+      "data": {
+        "event_id": "sample-4688-2026-09-23T10:23:40Z-0",
+        "EventID": 4688,
+        "Channel": "Security",
+        "Computer": "WEB-SRV-01",
+        "TimeCreated": "2026-09-23T10:23:40Z",
+        "EventData": {
+          "NewProcessName": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+          "CommandLine": "powershell.exe -NoProfile -EncodedCommand VwByAGkAdABlAC0ATwB1AHQAcAB1AHQAIAAnAFMAZQBuAHQAaQBuAGUAbABGAG8AcgBnAGUAIABzAGkAbQB1AGwAYQB0AGUAZAAgAGUAbgBjAG8AZABlAGQAIABjAG8AbQBtAGEAbgBkACcA",
+          "ParentProcessName": "C:\\Windows\\System32\\cmd.exe",
+          "SubjectUserName": "svc-web",
+          "SubjectDomainName": "CORP",
+          "NewProcessId": "0x1a2c",
+          "ProcessId": "0x0f10"
+        }
+      }
+    },
+    {
+      "source": "windows",
+      "simulated": true,
+      "data": {
+        "event_id": "sample-1-2026-09-23T10:25:02Z-0",
+        "EventID": 1,
+        "Channel": "Microsoft-Windows-Sysmon/Operational",
+        "Computer": "WEB-SRV-01",
+        "TimeCreated": "2026-09-23T10:25:02Z",
+        "EventData": {
+          "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+          "CommandLine": "powershell.exe -NoProfile -File C:\\Ops\\healthcheck.ps1",
+          "ParentImage": "C:\\Windows\\explorer.exe",
+          "User": "CORP\\admin",
+          "ProcessId": 5120,
+          "ParentProcessId": 2044
+        }
+      }
+    }
+  ]
+}

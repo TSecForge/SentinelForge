@@ -1,0 +1,24 @@
+id: DET-WIN-003
+name: PowerShell Spawned by Suspicious Parent
+description: >
+  PowerShell was started by a script host or signed-binary proxy (mshta, wscript, cscript, rundll32,
+  regsvr32) or by WMI. These parent-child chains are uncommon in normal administration.
+version: "1.0"
+author: Sujhal Gurav
+source: builtin
+platform: windows
+event_type: process_creation
+severity: medium
+fidelity: medium
+category: powershell
+applies_when:
+  technologies: [PowerShell]
+selection:
+  process.name: [powershell.exe, pwsh.exe]
+condition:
+  process.parent_name: [mshta.exe, wscript.exe, cscript.exe, rundll32.exe, regsvr32.exe, wmiprvse.exe, sqlservr.exe]
+summary: "{process.parent_name} spawned {process.name} on {host}"
+mitre: {tactic: execution, technique: T1059.001}
+tags: [windows, powershell, execution]
+false_positives:
+  - Management tooling that runs PowerShell through WMI (SCCM and similar)

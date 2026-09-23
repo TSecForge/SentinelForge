@@ -1,0 +1,24 @@
+id: DET-WIN-012
+name: WinRM Remote Shell Activity
+description: >
+  The WinRM plugin host (wsmprovhost.exe) spawned a shell or account/network enumeration tool,
+  meaning commands are being executed remotely over PowerShell Remoting / WinRM.
+version: "1.0"
+author: Sujhal Gurav
+source: builtin
+platform: windows
+event_type: process_creation
+severity: medium
+fidelity: low
+category: remote_access
+applies_when:
+  technologies: [WinRM]
+selection:
+  process.parent_name: wsmprovhost.exe
+condition:
+  process.name: [cmd.exe, net.exe, net1.exe, whoami.exe, nltest.exe, reg.exe, certutil.exe, rundll32.exe]
+summary: "Remote WinRM session on {host} ran {process.name} as {actor.user}"
+mitre: {tactic: lateral-movement, technique: T1021.006}
+tags: [windows, winrm, remote-access]
+false_positives:
+  - Routine remote administration (expected on managed servers; review the user)

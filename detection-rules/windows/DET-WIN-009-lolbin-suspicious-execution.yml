@@ -1,0 +1,29 @@
+id: DET-WIN-009
+name: Suspicious Signed-Binary Proxy Execution
+description: >
+  A built-in Windows binary (certutil, mshta, rundll32, regsvr32, bitsadmin, msiexec, wmic) was used
+  in a way associated with downloading or proxy-executing code.
+version: "1.0"
+author: Sujhal Gurav
+source: builtin
+platform: windows
+event_type: process_creation
+severity: high
+fidelity: high
+category: windows_process
+selection:
+  process.name: [certutil.exe, mshta.exe, rundll32.exe, regsvr32.exe, bitsadmin.exe, msiexec.exe, wmic.exe]
+condition:
+  process.command_line|re:
+    - 'certutil.*(-urlcache|-decode|-encode|verifyctl)'
+    - 'mshta(\.exe)?\s+["'']?(https?:|javascript:|vbscript:)'
+    - 'rundll32(\.exe)?\s+.*javascript:'
+    - 'regsvr32.*/i:\s*https?:'
+    - 'bitsadmin.*/transfer'
+    - 'msiexec.*/q.*https?://'
+    - 'wmic.*process\s+call\s+create'
+summary: "{process.name} proxy execution on {host}: {process.command_line}"
+mitre: {tactic: defense-evasion, technique: T1218}
+tags: [windows, lolbin, defense-evasion]
+false_positives:
+  - certutil -decode used by some legitimate deployment scripts

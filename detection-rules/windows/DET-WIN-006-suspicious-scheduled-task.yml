@@ -1,0 +1,24 @@
+id: DET-WIN-006
+name: Suspicious Scheduled Task Creation
+description: >
+  A scheduled task was registered whose action runs a script interpreter / LOLBin or a binary in a
+  user-writable directory.
+version: "1.0"
+author: Sujhal Gurav
+source: builtin
+platform: windows
+event_type: scheduled_task_creation
+severity: medium
+fidelity: medium
+category: windows_persistence
+selection:
+  task.name|exists: true
+condition:
+  any:
+    - task.command|contains: [powershell, pwsh, mshta, "cmd.exe /c", wscript, cscript, rundll32, regsvr32, certutil, bitsadmin]
+    - task.command|re: '\\(users\\public|appdata|temp)\\'
+summary: "Scheduled task '{task.name}' on {host} runs: {task.command}"
+mitre: {tactic: persistence, technique: T1053.005}
+tags: [windows, scheduled-task, persistence]
+false_positives:
+  - Admin maintenance tasks that run PowerShell scripts (allowlist by task name)

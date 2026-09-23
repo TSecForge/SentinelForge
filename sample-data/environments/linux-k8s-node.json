@@ -1,0 +1,45 @@
+{
+  "_comment": "SYNTHETIC sample inventory (Kubernetes worker node) for SentinelForge demo mode. Not a real host.",
+  "schema_version": "1.0",
+  "collection_time": "2026-09-23T10:15:00Z",
+  "collector": {"name": "sentinelforge-linux-discovery", "version": "0.1.0", "mode": "simulated"},
+  "simulated": true,
+  "host": {
+    "hostname": "K8S-NODE-01",
+    "platform": "linux",
+    "os": "Ubuntu 22.04.4 LTS",
+    "os_version": "5.15.0-119-generic",
+    "architecture": "x86_64",
+    "part_of_domain": false
+  },
+  "network": {
+    "interfaces": [
+      {"name": "ens192", "status": "Up", "ipv4": [{"address": "10.10.40.11", "prefix_length": 24}], "gateways": ["10.10.40.1"], "dns_servers": ["10.10.30.8"]},
+      {"name": "cni0", "status": "Up", "ipv4": [{"address": "10.244.1.1", "prefix_length": 24}]}
+    ],
+    "routes": [{"destination": "0.0.0.0/0", "next_hop": "10.10.40.1", "interface": "ens192", "metric": 100}],
+    "listening_ports": [
+      {"protocol": "tcp", "address": "0.0.0.0", "port": 22, "process": "sshd"},
+      {"protocol": "tcp", "address": "0.0.0.0", "port": 10250, "process": "kubelet"},
+      {"protocol": "tcp", "address": "0.0.0.0", "port": 10256, "process": "kube-proxy"},
+      {"protocol": "tcp", "address": "127.0.0.1", "port": 10248, "process": "kubelet"}
+    ]
+  },
+  "services": [
+    {"name": "ssh", "status": "Running", "path": "/usr/sbin/sshd -D"},
+    {"name": "kubelet", "status": "Running", "path": "/usr/bin/kubelet"},
+    {"name": "containerd", "status": "Running", "path": "/usr/bin/containerd"}
+  ],
+  "processes": [
+    {"name": "kubelet", "pid": 901, "parent_pid": 1, "path": "/usr/bin/kubelet"},
+    {"name": "kube-proxy", "pid": 1402, "parent_pid": 1201, "path": "/usr/local/bin/kube-proxy"}
+  ],
+  "users": [{"name": "root", "enabled": true, "is_admin": true}, {"name": "ops", "enabled": true, "is_admin": true}],
+  "admin_group_members": ["root", "ops"],
+  "remote_access": {"ssh_present": true},
+  "containers": {
+    "docker": false,
+    "kubernetes": true,
+    "kubernetes_indicators": ["kubelet", "kube-proxy", "containerd_runtime"]
+  }
+}

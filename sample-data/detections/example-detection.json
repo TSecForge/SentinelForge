@@ -1,0 +1,133 @@
+{
+  "schema": "sentinelforge.detection.v1",
+  "detection_id": "det-1072119a9ad54d7d",
+  "timestamp": "2026-09-23T10:22:11Z",
+  "host": "WEB-SRV-01",
+  "rule": {
+    "id": "DET-WIN-001",
+    "name": "Office Application Spawning PowerShell",
+    "version": "1.0",
+    "source": "builtin",
+    "author": "Sujhal Gurav"
+  },
+  "severity": "high",
+  "confidence": 0.9,
+  "confidence_basis": "rule fidelity 'high' = 0.9",
+  "event_type": "process_creation",
+  "description": "A Microsoft Office application started PowerShell. Documents launching script interpreters are a common initial-access pattern (malicious macros, embedded OLE objects).\n",
+  "summary": "winword.exe spawned powershell.exe on WEB-SRV-01 (user jdoe)",
+  "mitre": {
+    "tactic": "execution",
+    "technique": "T1059.001"
+  },
+  "observables": [
+    {
+      "type": "process",
+      "value": "powershell.exe",
+      "context": "process.name"
+    },
+    {
+      "type": "process",
+      "value": "winword.exe",
+      "context": "process.parent_name"
+    },
+    {
+      "type": "file_path",
+      "value": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "context": "process.path"
+    },
+    {
+      "type": "command_line",
+      "value": "powershell.exe -nop -w hidden -c Get-Process",
+      "context": "process.command_line"
+    },
+    {
+      "type": "user",
+      "value": "jdoe",
+      "context": "actor.user"
+    },
+    {
+      "type": "hostname",
+      "value": "WEB-SRV-01",
+      "context": "host"
+    }
+  ],
+  "evidence": {
+    "process.name": "powershell.exe",
+    "process.parent_name": "winword.exe"
+  },
+  "context": {
+    "environment_id": 1,
+    "environment_profiled": true,
+    "environment_type": [
+      "windows",
+      "server",
+      "web_server",
+      "remote_access",
+      "container_host",
+      "domain_joined"
+    ],
+    "technologies": [
+      "Defender",
+      "Docker",
+      "IIS",
+      "PowerShell",
+      "RDP",
+      "SMB",
+      "WinRM"
+    ],
+    "host_ips": [
+      "10.10.20.10",
+      "fe80::250:56ff:fe00:1010",
+      "172.28.16.1"
+    ],
+    "related_exposed_services": [],
+    "rule_selected_because": "host platform is windows; PowerShell discovered (Windows PowerShell ships with Windows; PowerShell 7 installed/running)",
+    "tags": [
+      "windows",
+      "powershell",
+      "office",
+      "execution"
+    ],
+    "false_positives": [
+      "Office add-ins that legitimately shell out to PowerShell (rare - baseline and tune)"
+    ]
+  },
+  "source": {
+    "type": "windows",
+    "event_id": "sample-1-2026-09-23T10:22:11Z-0",
+    "raw_reference": "Microsoft-Windows-Sysmon/Operational/1"
+  },
+  "simulated": true,
+  "event": {
+    "event_id": "sample-1-2026-09-23T10:22:11Z-0",
+    "timestamp": "2026-09-23T10:22:11Z",
+    "source": "windows",
+    "host": "WEB-SRV-01",
+    "event_type": "process_creation",
+    "simulated": true,
+    "actor": {
+      "user": "jdoe",
+      "domain": "CORP"
+    },
+    "process": {
+      "name": "powershell.exe",
+      "pid": 4212,
+      "path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "command_line": "powershell.exe -nop -w hidden -c Get-Process",
+      "parent_name": "winword.exe",
+      "parent_pid": 3120
+    },
+    "network": {},
+    "auth": {},
+    "service": {},
+    "task": {},
+    "group": {},
+    "container": {
+      "host_ports": []
+    },
+    "k8s": {},
+    "file": {},
+    "raw_reference": "Microsoft-Windows-Sysmon/Operational/1"
+  }
+}

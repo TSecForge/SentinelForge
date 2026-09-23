@@ -1,0 +1,20 @@
+id: DET-K8S-003
+name: Binding to cluster-admin
+description: A (Cluster)RoleBinding referencing the cluster-admin role was created or modified.
+version: "1.0"
+author: Sujhal Gurav
+source: builtin
+platform: kubernetes
+event_type: k8s_audit
+severity: high
+fidelity: high
+category: kubernetes
+selection:
+  k8s.resource: [clusterrolebindings, rolebindings]
+  k8s.verb: [create, update, patch]
+  k8s.role: cluster-admin
+summary: "{actor.user} bound cluster-admin via {k8s.resource}/{k8s.name}"
+mitre: {tactic: privilege-escalation, technique: T1098}
+tags: [kubernetes, rbac]
+false_positives:
+  - Cluster bootstrap / GitOps reconcilers

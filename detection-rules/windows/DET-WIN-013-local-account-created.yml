@@ -1,0 +1,18 @@
+id: DET-WIN-013
+name: Local User Account Created
+description: A new local user account was created on the host.
+version: "1.0"
+author: Sujhal Gurav
+source: builtin
+platform: windows
+event_type: user_account_created
+severity: low
+fidelity: medium
+category: windows_account
+selection:
+  actor.target_user|exists: true
+summary: "Account {actor.target_user} created on {host} by {actor.user}"
+mitre: {tactic: persistence, technique: T1136.001}
+tags: [windows, account]
+false_positives:
+  - Normal provisioning

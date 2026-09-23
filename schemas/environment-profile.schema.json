@@ -1,0 +1,243 @@
+{
+  "$defs": {
+    "ExposedService": {
+      "properties": {
+        "port": {
+          "title": "Port",
+          "type": "integer"
+        },
+        "protocol": {
+          "title": "Protocol",
+          "type": "string"
+        },
+        "service": {
+          "title": "Service",
+          "type": "string"
+        },
+        "process": {
+          "default": "",
+          "title": "Process",
+          "type": "string"
+        },
+        "bind": {
+          "default": "",
+          "title": "Bind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "port",
+        "protocol",
+        "service"
+      ],
+      "title": "ExposedService",
+      "type": "object"
+    },
+    "NetworkSummary": {
+      "properties": {
+        "ip_addresses": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Ip Addresses",
+          "type": "array"
+        },
+        "cidrs": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Cidrs",
+          "type": "array"
+        },
+        "gateways": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Gateways",
+          "type": "array"
+        },
+        "dns_servers": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Dns Servers",
+          "type": "array"
+        },
+        "route_count": {
+          "default": 0,
+          "title": "Route Count",
+          "type": "integer"
+        }
+      },
+      "title": "NetworkSummary",
+      "type": "object"
+    },
+    "RiskContext": {
+      "properties": {
+        "remote_access": {
+          "default": false,
+          "title": "Remote Access",
+          "type": "boolean"
+        },
+        "internet_facing_indicator": {
+          "default": false,
+          "title": "Internet Facing Indicator",
+          "type": "boolean"
+        },
+        "containerized": {
+          "default": false,
+          "title": "Containerized",
+          "type": "boolean"
+        },
+        "firewall_disabled_profiles": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Firewall Disabled Profiles",
+          "type": "array"
+        },
+        "defender_realtime_disabled": {
+          "default": false,
+          "title": "Defender Realtime Disabled",
+          "type": "boolean"
+        }
+      },
+      "title": "RiskContext",
+      "type": "object"
+    },
+    "RuleParameters": {
+      "description": "Environment facts that rule templates may reference as `$profile.<name>`.",
+      "properties": {
+        "listening_ports": {
+          "default": [],
+          "items": {
+            "type": "integer"
+          },
+          "title": "Listening Ports",
+          "type": "array"
+        },
+        "approved_images": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Approved Images",
+          "type": "array"
+        },
+        "container_ports": {
+          "default": [],
+          "items": {
+            "type": "integer"
+          },
+          "title": "Container Ports",
+          "type": "array"
+        },
+        "internal_cidrs": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Internal Cidrs",
+          "type": "array"
+        },
+        "known_admins": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Known Admins",
+          "type": "array"
+        }
+      },
+      "title": "RuleParameters",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "hostname": {
+      "title": "Hostname",
+      "type": "string"
+    },
+    "platform": {
+      "title": "Platform",
+      "type": "string"
+    },
+    "os": {
+      "title": "Os",
+      "type": "string"
+    },
+    "environment_type": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Environment Type",
+      "type": "array"
+    },
+    "technologies": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Technologies",
+      "type": "array"
+    },
+    "exposed_services": {
+      "items": {
+        "$ref": "#/$defs/ExposedService"
+      },
+      "title": "Exposed Services",
+      "type": "array"
+    },
+    "risk_context": {
+      "$ref": "#/$defs/RiskContext"
+    },
+    "network": {
+      "$ref": "#/$defs/NetworkSummary"
+    },
+    "rule_categories": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Rule Categories",
+      "type": "array"
+    },
+    "parameters": {
+      "$ref": "#/$defs/RuleParameters"
+    },
+    "evidence": {
+      "additionalProperties": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "title": "Evidence",
+      "type": "object"
+    }
+  },
+  "required": [
+    "hostname",
+    "platform",
+    "os",
+    "environment_type",
+    "technologies",
+    "exposed_services",
+    "risk_context",
+    "network",
+    "rule_categories",
+    "parameters"
+  ],
+  "title": "EnvironmentProfile",
+  "type": "object",
+  "$id": "https://sentinelforge.dev/schemas/environment-profile.schema.json"
+}

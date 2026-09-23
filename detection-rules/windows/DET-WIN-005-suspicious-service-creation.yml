@@ -1,0 +1,24 @@
+id: DET-WIN-005
+name: Windows Service Created From Suspicious Location
+description: >
+  A new service was installed whose binary lives in a user-writable directory or whose command line
+  invokes a script interpreter.
+version: "1.0"
+author: Sujhal Gurav
+source: builtin
+platform: windows
+event_type: service_creation
+severity: high
+fidelity: medium
+category: windows_persistence
+selection:
+  service.name|exists: true
+condition:
+  any:
+    - service.path|re: '\\(users\\public|appdata|temp|programdata|perflogs)\\'
+    - service.path|contains: [powershell, "cmd.exe /c", "cmd /c", mshta, rundll32, "%comspec%"]
+summary: "Service '{service.name}' installed on {host}: {service.path}"
+mitre: {tactic: persistence, technique: T1543.003}
+tags: [windows, service, persistence]
+false_positives:
+  - Some installers stage service binaries under ProgramData

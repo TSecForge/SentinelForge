@@ -1,0 +1,23 @@
+id: DET-WIN-004
+name: Unexpected Administrative Account Creation
+description: >
+  An account that was not an administrator at discovery time was added to a privileged group
+  (Administrators, Domain Admins, Enterprise Admins).
+version: "1.0"
+author: Sujhal Gurav
+source: builtin
+platform: windows
+event_type: user_group_change
+severity: high
+fidelity: high
+category: windows_account
+selection:
+  group.action: added
+  group.name: [administrators, domain admins, enterprise admins, schema admins]
+condition:
+  group.member|not_in: $profile.known_admins
+summary: "{group.member} added to {group.name} on {host} by {actor.user}"
+mitre: {tactic: persistence, technique: T1098}
+tags: [windows, account, privilege]
+false_positives:
+  - Planned administrator onboarding (re-run discovery afterwards to refresh the baseline)

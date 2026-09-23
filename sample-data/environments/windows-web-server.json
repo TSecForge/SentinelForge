@@ -1,0 +1,131 @@
+{
+  "_comment": "SYNTHETIC sample inventory for SentinelForge demo mode. Not a real host. Addresses are private (RFC1918) or documentation ranges.",
+  "schema_version": "1.0",
+  "collection_time": "2026-09-23T10:00:00Z",
+  "collector": {"name": "sentinelforge-windows-discovery", "version": "1.0.0", "mode": "simulated"},
+  "simulated": true,
+  "host": {
+    "hostname": "WEB-SRV-01",
+    "platform": "windows",
+    "os": "Microsoft Windows Server 2022 Datacenter",
+    "os_version": "10.0.20348",
+    "build": "20348",
+    "architecture": "64-bit",
+    "domain": "corp.example",
+    "part_of_domain": true,
+    "boot_time": "2026-09-01T06:12:00Z",
+    "uptime_seconds": 1914480
+  },
+  "network": {
+    "interfaces": [
+      {
+        "name": "Ethernet0",
+        "description": "vmxnet3 Ethernet Adapter",
+        "mac": "00-50-56-00-10-10",
+        "status": "Up",
+        "ipv4": [{"address": "10.10.20.10", "prefix_length": 24}],
+        "ipv6": [{"address": "fe80::250:56ff:fe00:1010", "prefix_length": 64}],
+        "gateways": ["10.10.20.1"],
+        "dns_servers": ["10.10.30.8", "10.10.30.9"]
+      },
+      {
+        "name": "vEthernet (nat)",
+        "description": "Hyper-V Virtual Ethernet Adapter (Docker NAT)",
+        "mac": "00-15-5D-00-AC-01",
+        "status": "Up",
+        "ipv4": [{"address": "172.28.16.1", "prefix_length": 20}],
+        "ipv6": [],
+        "gateways": [],
+        "dns_servers": []
+      }
+    ],
+    "routes": [
+      {"destination": "0.0.0.0/0", "next_hop": "10.10.20.1", "interface": "Ethernet0", "metric": 25},
+      {"destination": "10.10.20.0/24", "next_hop": "0.0.0.0", "interface": "Ethernet0", "metric": 281},
+      {"destination": "172.28.16.0/20", "next_hop": "0.0.0.0", "interface": "vEthernet (nat)", "metric": 5256}
+    ],
+    "listening_ports": [
+      {"protocol": "tcp", "address": "0.0.0.0", "port": 80, "pid": 4, "process": "System"},
+      {"protocol": "tcp", "address": "0.0.0.0", "port": 135, "pid": 912, "process": "svchost"},
+      {"protocol": "tcp", "address": "0.0.0.0", "port": 443, "pid": 4, "process": "System"},
+      {"protocol": "tcp", "address": "0.0.0.0", "port": 445, "pid": 4, "process": "System"},
+      {"protocol": "tcp", "address": "0.0.0.0", "port": 3389, "pid": 1204, "process": "svchost"},
+      {"protocol": "tcp", "address": "0.0.0.0", "port": 5985, "pid": 4, "process": "System"},
+      {"protocol": "tcp", "address": "0.0.0.0", "port": 8080, "pid": 2980, "process": "dockerd"},
+      {"protocol": "tcp", "address": "0.0.0.0", "port": 8443, "pid": 2980, "process": "dockerd"},
+      {"protocol": "tcp", "address": "0.0.0.0", "port": 9100, "pid": 2980, "process": "dockerd"},
+      {"protocol": "tcp", "address": "0.0.0.0", "port": 15672, "pid": 2980, "process": "dockerd"},
+      {"protocol": "tcp", "address": "127.0.0.1", "port": 2375, "pid": 2980, "process": "dockerd"},
+      {"protocol": "tcp", "address": "0.0.0.0", "port": 49664, "pid": 688, "process": "lsass"},
+      {"protocol": "udp", "address": "0.0.0.0", "port": 123, "pid": 1344, "process": "svchost"},
+      {"protocol": "udp", "address": "10.10.20.10", "port": 137, "pid": 4, "process": "System"}
+    ]
+  },
+  "services": [
+    {"name": "W3SVC", "display_name": "World Wide Web Publishing Service", "status": "Running", "start_type": "Auto", "path": "C:\\Windows\\system32\\svchost.exe -k iissvcs"},
+    {"name": "WAS", "display_name": "Windows Process Activation Service", "status": "Running", "start_type": "Manual", "path": "C:\\Windows\\system32\\svchost.exe -k iissvcs"},
+    {"name": "WinRM", "display_name": "Windows Remote Management (WS-Management)", "status": "Running", "start_type": "Auto", "path": "C:\\Windows\\System32\\svchost.exe -k NetworkService -p"},
+    {"name": "TermService", "display_name": "Remote Desktop Services", "status": "Running", "start_type": "Manual", "path": "C:\\Windows\\System32\\svchost.exe -k NetworkService"},
+    {"name": "docker", "display_name": "Docker Engine", "status": "Running", "start_type": "Auto", "path": "\"C:\\Program Files\\Docker\\dockerd.exe\" --run-service"},
+    {"name": "WinDefend", "display_name": "Microsoft Defender Antivirus Service", "status": "Running", "start_type": "Auto", "path": "\"C:\\ProgramData\\Microsoft\\Windows Defender\\platform\\4.18.24090.11-0\\MsMpEng.exe\""},
+    {"name": "MpsSvc", "display_name": "Windows Defender Firewall", "status": "Running", "start_type": "Auto", "path": "C:\\Windows\\system32\\svchost.exe -k LocalServiceNoNetworkFirewall -p"},
+    {"name": "EventLog", "display_name": "Windows Event Log", "status": "Running", "start_type": "Auto", "path": "C:\\Windows\\System32\\svchost.exe -k LocalServiceNetworkRestricted -p"},
+    {"name": "Sysmon64", "display_name": "Sysmon64", "status": "Running", "start_type": "Auto", "path": "C:\\Windows\\Sysmon64.exe"},
+    {"name": "Spooler", "display_name": "Print Spooler", "status": "Stopped", "start_type": "Disabled", "path": "C:\\Windows\\System32\\spoolsv.exe"}
+  ],
+  "processes": [
+    {"name": "System", "pid": 4, "parent_pid": 0, "path": "", "command_line": ""},
+    {"name": "lsass.exe", "pid": 688, "parent_pid": 540, "path": "C:\\Windows\\System32\\lsass.exe", "command_line": "C:\\Windows\\system32\\lsass.exe"},
+    {"name": "svchost.exe", "pid": 912, "parent_pid": 668, "path": "C:\\Windows\\System32\\svchost.exe", "command_line": "C:\\Windows\\system32\\svchost.exe -k DcomLaunch -p"},
+    {"name": "w3wp.exe", "pid": 3412, "parent_pid": 1790, "path": "C:\\Windows\\System32\\inetsrv\\w3wp.exe", "command_line": "c:\\windows\\system32\\inetsrv\\w3wp.exe -ap \"DefaultAppPool\""},
+    {"name": "dockerd.exe", "pid": 2980, "parent_pid": 668, "path": "C:\\Program Files\\Docker\\dockerd.exe", "command_line": "\"C:\\Program Files\\Docker\\dockerd.exe\" --run-service"},
+    {"name": "Sysmon64.exe", "pid": 2104, "parent_pid": 668, "path": "C:\\Windows\\Sysmon64.exe", "command_line": "C:\\Windows\\Sysmon64.exe"},
+    {"name": "wsmprovhost.exe", "pid": 5120, "parent_pid": 912, "path": "C:\\Windows\\System32\\wsmprovhost.exe", "command_line": "C:\\Windows\\system32\\wsmprovhost.exe -Embedding"}
+  ],
+  "users": [
+    {"name": "Administrator", "enabled": true, "is_admin": true, "last_logon": "2026-09-22T17:40:00Z"},
+    {"name": "backup-admin", "enabled": true, "is_admin": true, "last_logon": "2026-09-23T02:00:00Z"},
+    {"name": "svc-web", "enabled": true, "is_admin": false, "last_logon": "2026-09-23T09:58:00Z"},
+    {"name": "Guest", "enabled": false, "is_admin": false, "last_logon": ""}
+  ],
+  "admin_group_members": ["WEB-SRV-01\\Administrator", "WEB-SRV-01\\backup-admin", "CORP\\Domain Admins"],
+  "software": [
+    {"name": "PowerShell 7-x64", "version": "7.4.5.0", "publisher": "Microsoft Corporation"},
+    {"name": "Docker Engine", "version": "27.2.1", "publisher": "Docker Inc."},
+    {"name": "Sysmon", "version": "15.15", "publisher": "Sysinternals"},
+    {"name": "IIS URL Rewrite Module 2", "version": "7.2.1993", "publisher": "Microsoft Corporation"},
+    {"name": "Microsoft Visual C++ 2015-2022 Redistributable (x64)", "version": "14.40.33810.0", "publisher": "Microsoft Corporation"}
+  ],
+  "scheduled_tasks": [
+    {"name": "Nightly IIS Log Archive", "path": "\\Ops\\", "state": "Ready", "actions": ["C:\\Program Files\\PowerShell\\7\\pwsh.exe -File C:\\Ops\\archive-logs.ps1"]},
+    {"name": "ScheduledDefrag", "path": "\\Microsoft\\Windows\\Defrag\\", "state": "Ready", "actions": ["%windir%\\system32\\defrag.exe -c -h -o -$"]}
+  ],
+  "security": {
+    "defender": {"antivirus_enabled": true, "realtime_enabled": true, "tamper_protected": true, "signature_last_updated": "2026-09-23T04:00:00Z"},
+    "firewall_profiles": [{"name": "Domain", "enabled": true}, {"name": "Private", "enabled": true}, {"name": "Public", "enabled": true}],
+    "audit_policy": {"Process Creation": "Success", "Logon": "Success and Failure", "Security Group Management": "Success", "User Account Management": "Success and Failure"},
+    "security_services": ["WinDefend=Running", "MpsSvc=Running", "EventLog=Running", "Sysmon64=Running", "WinRM=Running"]
+  },
+  "remote_access": {"rdp_enabled": true, "rdp_port": 3389, "winrm_enabled": true, "ssh_present": false},
+  "web_servers": {
+    "iis": true, "apache": false, "nginx": false,
+    "iis_sites": [{"name": "Default Web Site", "state": "Started", "bindings": ["http *:80:", "https *:443:"]}]
+  },
+  "containers": {
+    "docker": true,
+    "docker_service_status": "Running",
+    "containers": [
+      {"id": "3f2a9c1d0b11", "name": "web-proxy", "image": "nginx:1.25", "ports": ["0.0.0.0:8443->443/tcp"], "status": "running"},
+      {"id": "8b7e6d5c4a22", "name": "orders-api", "image": "registry.example.net/internal/orders-api:2.3.1", "ports": ["0.0.0.0:8080->8080/tcp"], "status": "running"},
+      {"id": "1c2d3e4f5a33", "name": "orders-worker", "image": "registry.example.net/internal/orders-worker:2.3.1", "ports": [], "status": "running"},
+      {"id": "9a8b7c6d5e44", "name": "cache", "image": "redis:7.2-alpine", "ports": ["6379/tcp"], "status": "running"},
+      {"id": "4e5f6a7b8c55", "name": "node-metrics", "image": "prom/node-exporter:v1.8.1", "ports": ["0.0.0.0:9100->9100/tcp"], "status": "running"},
+      {"id": "5f6a7b8c9d66", "name": "queue", "image": "rabbitmq:3.13-management", "ports": ["0.0.0.0:15672->15672/tcp", "5672/tcp"], "status": "running"},
+      {"id": "6a7b8c9d0e77", "name": "log-shipper", "image": "fluent/fluent-bit:3.0", "ports": [], "status": "running"}
+    ],
+    "images": ["nginx:1.25", "registry.example.net/internal/orders-api:2.3.1", "registry.example.net/internal/orders-worker:2.3.1",
+               "redis:7.2-alpine", "prom/node-exporter:v1.8.1", "rabbitmq:3.13-management", "fluent/fluent-bit:3.0"],
+    "kubernetes": false,
+    "kubernetes_indicators": []
+  }
+}

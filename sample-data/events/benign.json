@@ -1,0 +1,124 @@
+{
+  "_comment": "SYNTHETIC sample events for SentinelForge (simulated=true). POST this file to /api/v1/events/batch after creating the WEB-SRV-01 demo environment.",
+  "events": [
+    {
+      "source": "windows",
+      "simulated": true,
+      "data": {
+        "event_id": "sample-1-2026-09-23T10:40:00Z-0",
+        "EventID": 1,
+        "Channel": "Microsoft-Windows-Sysmon/Operational",
+        "Computer": "WEB-SRV-01",
+        "TimeCreated": "2026-09-23T10:40:00Z",
+        "EventData": {
+          "Image": "C:\\Windows\\System32\\svchost.exe",
+          "CommandLine": "svchost.exe -k netsvcs -p",
+          "ParentImage": "C:\\Windows\\System32\\services.exe",
+          "User": "NT AUTHORITY\\SYSTEM"
+        }
+      }
+    },
+    {
+      "source": "windows",
+      "simulated": true,
+      "data": {
+        "event_id": "sample-4624-2026-09-23T10:40:05Z-0",
+        "EventID": 4624,
+        "Channel": "Security",
+        "Computer": "WEB-SRV-01",
+        "TimeCreated": "2026-09-23T10:40:05Z",
+        "EventData": {
+          "TargetUserName": "svc-web",
+          "TargetDomainName": "CORP",
+          "LogonType": 3,
+          "IpAddress": "10.10.30.5"
+        }
+      }
+    },
+    {
+      "source": "windows",
+      "simulated": true,
+      "data": {
+        "event_id": "sample-3-2026-09-23T10:40:09Z-0",
+        "EventID": 3,
+        "Channel": "Microsoft-Windows-Sysmon/Operational",
+        "Computer": "WEB-SRV-01",
+        "TimeCreated": "2026-09-23T10:40:09Z",
+        "EventData": {
+          "Image": "C:\\Windows\\System32\\svchost.exe",
+          "Protocol": "tcp",
+          "Initiated": "true",
+          "SourceIp": "10.10.20.10",
+          "SourcePort": 50001,
+          "DestinationIp": "203.0.113.10",
+          "DestinationPort": 443
+        }
+      }
+    },
+    {
+      "source": "windows",
+      "simulated": true,
+      "data": {
+        "event_id": "sample-22-2026-09-23T10:40:10Z-0",
+        "EventID": 22,
+        "Channel": "Microsoft-Windows-Sysmon/Operational",
+        "Computer": "WEB-SRV-01",
+        "TimeCreated": "2026-09-23T10:40:10Z",
+        "EventData": {
+          "Image": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+          "QueryName": "www.example.com"
+        }
+      }
+    },
+    {
+      "source": "windows",
+      "simulated": true,
+      "data": {
+        "event_id": "sample-5154-2026-09-23T10:40:12Z-0",
+        "EventID": 5154,
+        "Channel": "Security",
+        "Computer": "WEB-SRV-01",
+        "TimeCreated": "2026-09-23T10:40:12Z",
+        "EventData": {
+          "Application": "System",
+          "SourceAddress": "0.0.0.0",
+          "SourcePort": 443,
+          "Protocol": 6
+        }
+      }
+    },
+    {
+      "source": "docker",
+      "simulated": true,
+      "data": {
+        "event_id": "sample-docker-web-proxy-3",
+        "host": "WEB-SRV-01",
+        "Type": "container",
+        "Action": "start",
+        "time": 1790160000,
+        "Actor": {
+          "ID": "7765622d70726f78792d337765622d70726f78792d337765622d70726f78792d",
+          "Attributes": {
+            "image": "nginx:1.25",
+            "name": "web-proxy-3"
+          }
+        },
+        "host_ports": [
+          8443
+        ],
+        "privileged": false
+      }
+    },
+    {
+      "source": "generic",
+      "simulated": true,
+      "data": {
+        "event_id": "sample-generic-1",
+        "host": "WEB-SRV-01",
+        "event_type": "custom_heartbeat",
+        "timestamp": "2026-09-23T10:40:20Z",
+        "message": "agentless collector heartbeat"
+      }
+    }
+  ]
+}

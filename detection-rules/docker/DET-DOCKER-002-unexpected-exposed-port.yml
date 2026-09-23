@@ -1,0 +1,19 @@
+id: DET-DOCKER-002
+name: Container Exposing Unexpected Port
+description: >
+  A container published a host port that no container published at discovery time.
+version: "1.0"
+author: Sujhal Gurav
+source: builtin
+platform: docker
+event_type: container_start
+severity: medium
+fidelity: medium
+category: container
+selection:
+  container.host_ports|not_in: $profile.container_ports
+summary: "Container '{container.name}' ({container.image}) on {host} published ports {container.host_ports}"
+mitre: {tactic: execution, technique: T1610}
+tags: [docker, container, network]
+false_positives:
+  - New services being rolled out

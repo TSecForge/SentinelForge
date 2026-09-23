@@ -1,0 +1,279 @@
+{
+  "$defs": {
+    "Applicability": {
+      "additionalProperties": false,
+      "description": "When a template is relevant. Every key that is set must be satisfied; within a key it's any-of.\nEmpty = applies to any environment on the rule's platform.",
+      "properties": {
+        "platforms": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Platforms",
+          "type": "array"
+        },
+        "technologies": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Technologies",
+          "type": "array"
+        },
+        "environment_types": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Environment Types",
+          "type": "array"
+        }
+      },
+      "title": "Applicability",
+      "type": "object"
+    },
+    "Mitre": {
+      "additionalProperties": false,
+      "properties": {
+        "tactic": {
+          "pattern": "^[a-z\\-]{3,40}$",
+          "title": "Tactic",
+          "type": "string"
+        },
+        "technique": {
+          "pattern": "^T\\d{4}(\\.\\d{3})?$",
+          "title": "Technique",
+          "type": "string"
+        }
+      },
+      "required": [
+        "tactic",
+        "technique"
+      ],
+      "title": "Mitre",
+      "type": "object"
+    },
+    "Threshold": {
+      "additionalProperties": false,
+      "properties": {
+        "count": {
+          "maximum": 100000,
+          "minimum": 2,
+          "title": "Count",
+          "type": "integer"
+        },
+        "window_seconds": {
+          "maximum": 86400,
+          "minimum": 1,
+          "title": "Window Seconds",
+          "type": "integer"
+        },
+        "group_by": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 5,
+          "title": "Group By",
+          "type": "array"
+        }
+      },
+      "required": [
+        "count",
+        "window_seconds"
+      ],
+      "title": "Threshold",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "pattern": "^[A-Z0-9][A-Z0-9\\-]{2,63}$",
+      "title": "Id",
+      "type": "string"
+    },
+    "name": {
+      "maxLength": 200,
+      "minLength": 3,
+      "title": "Name",
+      "type": "string"
+    },
+    "description": {
+      "maxLength": 4000,
+      "minLength": 3,
+      "title": "Description",
+      "type": "string"
+    },
+    "version": {
+      "pattern": "^\\d+\\.\\d+(\\.\\d+)?$",
+      "title": "Version",
+      "type": "string"
+    },
+    "author": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Author",
+      "type": "string"
+    },
+    "source": {
+      "enum": [
+        "builtin",
+        "organization",
+        "user",
+        "community"
+      ],
+      "title": "Source",
+      "type": "string"
+    },
+    "status": {
+      "default": "stable",
+      "enum": [
+        "stable",
+        "experimental",
+        "deprecated"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "platform": {
+      "enum": [
+        "windows",
+        "linux",
+        "network",
+        "docker",
+        "kubernetes",
+        "any"
+      ],
+      "title": "Platform",
+      "type": "string"
+    },
+    "event_type": {
+      "pattern": "^[a-z][a-z0-9_]{1,63}$",
+      "title": "Event Type",
+      "type": "string"
+    },
+    "severity": {
+      "enum": [
+        "informational",
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "title": "Severity",
+      "type": "string"
+    },
+    "fidelity": {
+      "default": "medium",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "title": "Fidelity",
+      "type": "string"
+    },
+    "category": {
+      "default": "general",
+      "pattern": "^[a-z][a-z0-9_\\-]{1,40}$",
+      "title": "Category",
+      "type": "string"
+    },
+    "applies_when": {
+      "$ref": "#/$defs/Applicability"
+    },
+    "selection": {
+      "additionalProperties": true,
+      "minProperties": 1,
+      "title": "Selection",
+      "type": "object"
+    },
+    "condition": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Condition"
+    },
+    "threshold": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Threshold"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "summary": {
+      "anyOf": [
+        {
+          "maxLength": 500,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Summary"
+    },
+    "mitre": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Mitre"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "tags": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 32,
+      "title": "Tags",
+      "type": "array"
+    },
+    "references": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 16,
+      "title": "References",
+      "type": "array"
+    },
+    "false_positives": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 16,
+      "title": "False Positives",
+      "type": "array"
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "description",
+    "version",
+    "author",
+    "source",
+    "platform",
+    "event_type",
+    "severity",
+    "selection"
+  ],
+  "title": "RuleDefinition",
+  "type": "object",
+  "$id": "https://sentinelforge.dev/schemas/rule.schema.json"
+}

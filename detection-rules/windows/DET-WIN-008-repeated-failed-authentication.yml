@@ -1,0 +1,23 @@
+id: DET-WIN-008
+name: Repeated Failed Authentication
+description: >
+  Five or more failed logons against this host from the same source address within five minutes.
+version: "1.0"
+author: Sujhal Gurav
+source: builtin
+platform: windows
+event_type: authentication
+severity: medium
+fidelity: medium
+category: authentication
+selection:
+  auth.outcome: failure
+threshold:
+  count: 5
+  window_seconds: 300
+  group_by: [host, network.src_ip]
+summary: "Repeated failed logons on {host} from {network.src_ip} (last user {actor.user})"
+mitre: {tactic: credential-access, technique: T1110}
+tags: [windows, authentication, brute-force]
+false_positives:
+  - A service with a stale saved password retrying in a loop

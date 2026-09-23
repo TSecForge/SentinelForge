@@ -1,0 +1,23 @@
+# Example organization rule. Everything under custom-rules/ is loaded alongside the built-in packs
+# (see RULE_PATHS). Copy this file, change id/author, then restart or POST /api/v1/rules/reload.
+id: ORG-WIN-001
+name: PowerShell Script Executed From Temp Directory
+description: Internal policy - production servers must not run PowerShell scripts from temp directories.
+version: "1.0"
+author: Example Security Team
+source: organization
+status: experimental
+platform: windows
+event_type: process_creation
+severity: medium
+fidelity: medium
+category: powershell
+applies_when:
+  technologies: [PowerShell]
+  environment_types: [server]
+selection:
+  process.name: [powershell.exe, pwsh.exe]
+condition:
+  process.command_line|re: '\\(temp|tmp)\\[^ ]*\.ps1'
+summary: "PowerShell ran a script from a temp directory on {host}"
+tags: [organization, powershell]

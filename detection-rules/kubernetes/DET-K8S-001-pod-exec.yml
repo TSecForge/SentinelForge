@@ -1,0 +1,20 @@
+id: DET-K8S-001
+name: Interactive Exec Into Pod
+description: Someone opened an exec session into a running pod (kubectl exec).
+version: "1.0"
+author: Sujhal Gurav
+source: builtin
+platform: kubernetes
+event_type: k8s_audit
+severity: medium
+fidelity: medium
+category: kubernetes
+selection:
+  k8s.resource: pods
+  k8s.subresource: exec
+  k8s.verb: [create, get]
+summary: "{actor.user} exec'd into pod {k8s.namespace}/{k8s.name}"
+mitre: {tactic: execution, technique: T1609}
+tags: [kubernetes, exec]
+false_positives:
+  - Break-glass debugging by platform engineers

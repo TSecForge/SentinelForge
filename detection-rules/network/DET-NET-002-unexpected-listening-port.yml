@@ -1,0 +1,22 @@
+id: DET-NET-002
+name: New / Unexpected Listening Service
+description: >
+  A process started listening on a TCP port that was not listening when the environment was
+  discovered. Dynamic RPC range (>=49152) is excluded to limit noise.
+version: "1.0"
+author: Sujhal Gurav
+source: builtin
+platform: network
+event_type: network_listen
+severity: medium
+fidelity: medium
+category: network
+selection:
+  network.dst_port|not_in: $profile.listening_ports
+condition:
+  network.dst_port|lt: 49152
+summary: "{process.name} on {host} is listening on {network.protocol}/{network.dst_port} (not in discovery baseline)"
+mitre: {tactic: command-and-control, technique: T1571}
+tags: [network, listener, baseline-drift]
+false_positives:
+  - Newly deployed services (re-run discovery to refresh the baseline)

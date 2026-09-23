@@ -1,0 +1,20 @@
+id: DET-DOCKER-001
+name: Container Started From Unapproved Image
+description: >
+  A container started from an image that was not present on the host at discovery time. The approved
+  list is generated from the discovered images/containers.
+version: "1.0"
+author: Sujhal Gurav
+source: builtin
+platform: docker
+event_type: container_start
+severity: high
+fidelity: medium
+category: container
+selection:
+  container.image|not_in: $profile.approved_images
+summary: "Container '{container.name}' on {host} started from unapproved image {container.image}"
+mitre: {tactic: execution, technique: T1610}
+tags: [docker, container, image]
+false_positives:
+  - Legitimate image upgrades (new tag) until discovery is re-run

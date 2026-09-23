@@ -1,0 +1,20 @@
+id: DET-K8S-002
+name: Privileged Pod Created
+description: A pod was created with a container whose securityContext sets privileged=true.
+version: "1.0"
+author: Sujhal Gurav
+source: builtin
+platform: kubernetes
+event_type: k8s_audit
+severity: high
+fidelity: high
+category: kubernetes
+selection:
+  k8s.resource: pods
+  k8s.verb: create
+  k8s.privileged: true
+summary: "{actor.user} created privileged pod {k8s.namespace}/{k8s.name}"
+mitre: {tactic: privilege-escalation, technique: T1611}
+tags: [kubernetes, privilege]
+false_positives:
+  - System DaemonSets (CNI, storage drivers)
