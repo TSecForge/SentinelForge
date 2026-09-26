@@ -1,0 +1,35 @@
+name: Feature request
+description: Suggest an improvement or a new integration
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What are you trying to do, and what gets in the way today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: How should it work? API, config, UI, or plugin shape if you have one in mind.
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Type
+      options: [New collector, New event source / parser, New SIEM adapter, Rule engine capability, Dashboard, Deployment / packaging, Documentation, Other]
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: checkboxes
+    id: plugin
+    attributes:
+      label: Plugin
+      options:
+        - label: This could be built as a plugin (see docs/extending.md) and I may contribute it

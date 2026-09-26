@@ -1,0 +1,51 @@
+name: Bug report
+description: Something in SentinelForge doesn't work as documented
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. **Security vulnerabilities must not be reported here** - see SECURITY.md.
+        Please remove real hostnames, IPs, usernames and inventory data before pasting logs.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options: [Discovery / collector, Profiler, Rule engine / rules, Event normalization, SIEM integration, Dashboard, CLI, Docker / deployment, Other]
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Start backend with SIEM_MODE=...
+        2. POST /api/v1/events/batch with ...
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs / API responses
+      description: Structured log lines (JSON) or error responses. Redact secrets.
+      render: shell
+  - type: input
+    id: version
+    attributes:
+      label: SentinelForge version or commit
+      placeholder: "0.1.0 / e930de1"
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      placeholder: "Windows 11, Python 3.12, Node 22, SQLite / PostgreSQL, Docker yes/no"

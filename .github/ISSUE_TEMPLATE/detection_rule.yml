@@ -1,0 +1,43 @@
+name: Detection rule proposal
+description: Propose a new detection or report a false positive / false negative in an existing rule
+labels: [detection]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Request type
+      options: [New rule, False positive in an existing rule, False negative (missed activity), Rule metadata / ATT&CK mapping fix]
+    validations:
+      required: true
+  - type: input
+    id: rule
+    attributes:
+      label: Existing rule ID (if any)
+      placeholder: DET-WIN-001
+  - type: textarea
+    id: behaviour
+    attributes:
+      label: Behaviour to detect (or wrongly detected)
+      description: Describe the activity, why it matters, and in which environments (IIS, Docker, domain controllers...).
+    validations:
+      required: true
+  - type: input
+    id: attack
+    attributes:
+      label: MITRE ATT&CK technique
+      placeholder: T1059.001
+  - type: textarea
+    id: telemetry
+    attributes:
+      label: Telemetry source and example event
+      description: |
+        Which log provides the signal (e.g. Sysmon 1, Security 4688, Kubernetes audit) and a *sanitized* example.
+        Use documentation IPs (192.0.2.0/24, 198.51.100.0/24, 203.0.113.0/24) and example.* domains.
+      render: yaml
+    validations:
+      required: true
+  - type: textarea
+    id: fp
+    attributes:
+      label: Known false positives / benign look-alikes
+      description: These become the `no_match` cases in rule-tests/.
