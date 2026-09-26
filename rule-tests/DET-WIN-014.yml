@@ -1,0 +1,7 @@
+rule_id: DET-WIN-014
+match:
+  - name: Security log cleared
+    event: {event_type: log_cleared, actor: {user: jdoe}, message: Security event log cleared}
+no_match:
+  - name: Different event type
+    event: {event_type: authentication, auth: {outcome: success}}

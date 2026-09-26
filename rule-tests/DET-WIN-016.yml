@@ -1,0 +1,11 @@
+rule_id: DET-WIN-016
+match:
+  - name: Real-time monitoring turned off
+    event: {event_type: process_creation, process: {name: powershell.exe, command_line: "powershell -c Set-MpPreference -DisableRealtimeMonitoring $true"}}
+  - name: Folder exclusion added
+    event: {event_type: process_creation, process: {name: powershell.exe, command_line: "powershell -c Add-MpPreference -ExclusionPath C:\\Temp\\build"}}
+no_match:
+  - name: Real-time monitoring turned back on
+    event: {event_type: process_creation, process: {name: powershell.exe, command_line: "powershell -c Set-MpPreference -DisableRealtimeMonitoring $false"}}
+  - name: Status query
+    event: {event_type: process_creation, process: {name: powershell.exe, command_line: "powershell -c Get-MpComputerStatus"}}

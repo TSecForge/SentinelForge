@@ -1,0 +1,9 @@
+rule_id: DET-K8S-004
+match:
+  - name: User lists secrets
+    event: {event_type: k8s_audit, actor: {user: dev-user}, k8s: {verb: list, resource: secrets, namespace: prod}}
+no_match:
+  - name: Controller lists secrets
+    event: {event_type: k8s_audit, actor: {user: "system:serviceaccount:kube-system:replicaset-controller"}, k8s: {verb: list, resource: secrets}}
+  - name: User lists configmaps
+    event: {event_type: k8s_audit, actor: {user: dev-user}, k8s: {verb: list, resource: configmaps}}

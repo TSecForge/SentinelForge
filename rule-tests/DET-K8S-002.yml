@@ -1,0 +1,7 @@
+rule_id: DET-K8S-002
+match:
+  - name: Privileged pod created
+    event: {event_type: k8s_audit, k8s: {verb: create, resource: pods, privileged: true}}
+no_match:
+  - name: Regular pod created
+    event: {event_type: k8s_audit, k8s: {verb: create, resource: pods, privileged: false}}

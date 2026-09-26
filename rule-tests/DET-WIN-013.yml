@@ -1,0 +1,7 @@
+rule_id: DET-WIN-013
+match:
+  - name: Account created
+    event: {event_type: user_account_created, actor: {user: admin, target_user: svc-support}}
+no_match:
+  - name: Missing target account
+    event: {event_type: user_account_created, actor: {user: admin}}

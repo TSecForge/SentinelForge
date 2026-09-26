@@ -1,0 +1,7 @@
+rule_id: DET-K8S-003
+match:
+  - name: ClusterRoleBinding to cluster-admin
+    event: {event_type: k8s_audit, k8s: {verb: create, resource: clusterrolebindings, role: cluster-admin}}
+no_match:
+  - name: Binding to view role
+    event: {event_type: k8s_audit, k8s: {verb: create, resource: clusterrolebindings, role: view}}

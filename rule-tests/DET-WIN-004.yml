@@ -1,0 +1,12 @@
+rule_id: DET-WIN-004
+environment: windows-web-server
+match:
+  - name: New account added to Administrators
+    event: {event_type: user_group_change, group: {name: Administrators, member: svc-support, action: added}}
+no_match:
+  - name: Known admin re-added
+    event: {event_type: user_group_change, group: {name: Administrators, member: backup-admin, action: added}}
+  - name: Removal from Administrators
+    event: {event_type: user_group_change, group: {name: Administrators, member: svc-support, action: removed}}
+  - name: Non-privileged group
+    event: {event_type: user_group_change, group: {name: Backup Operators, member: svc-support, action: added}}

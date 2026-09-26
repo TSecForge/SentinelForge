@@ -3,6 +3,8 @@
     sentinelforge discovery [--local | --remote HOST | --file inventory.json] [--save]
     sentinelforge profile --file inventory.json | --template windows-web-server
     sentinelforge rules validate [PATH ...]
+    sentinelforge rules test
+    sentinelforge coverage export [--check]
     sentinelforge rules generate --file inventory.json | --template NAME
     sentinelforge events simulate --template NAME [--scenario NAME ...] [--benign N]
     sentinelforge demo [--template NAME] [--benign N]
@@ -82,6 +84,48 @@ def cmd_rules_validate(args):
     return 1 if report.errors else 0
 
 
+def _all_rules():
+    from app.services.rules.loader import load_rule_paths
+
+    return load_rule_paths(get_settings().split(get_settings().rule_paths)).rules
+
+
+def cmd_rules_test(args):
+    from app.services.rules.testing import run_all
+
+    results, errors = run_all(_all_rules())
+    cases = 0
+    for r in results:
+        cases += r.cases
+        print(f"  {'PASS' if r.ok else 'FAIL'}  {r.rule_id:16} {r.cases} case(s)")
+        for f in r.failures:
+            print(f"          {f}")
+    for path, errs in errors.items():
+        print(f"  ERROR {path}: {'; '.join(errs)}")
+    failed = [r for r in results if not r.ok]
+    print(f"{len(results) - len(failed)}/{len(results)} rules passed, {cases} test cases, {len(errors)} test-file error(s)")
+    return 1 if failed or errors else 0
+
+
+def cmd_coverage_export(args):
+    from app.services.rules.coverage import coverage_markdown, navigator_layer
+    from app.services.rules.testing import load_test_files
+
+    rules = _all_rules()
+    tested = set(load_test_files()[0])
+    out = Path(args.out)
+    files = {out / "attack-coverage.md": coverage_markdown(rules, tested), out / "attack-navigator-layer.json": navigator_layer(rules)}
+    stale = [p for p, text in files.items() if not p.exists() or p.read_text(encoding="utf-8") != text]
+    if args.check:
+        for p in stale:
+            print(f"stale: {p} (run `sentinelforge coverage export`)")
+        return 1 if stale else 0
+    for p, text in files.items():
+        p.write_text(text, encoding="utf-8", newline="\n")
+        print(f"wrote {p}")
+    return 0
+
+
 def cmd_rules_generate(args):
     from app.services import environments, rules
 
@@ -158,6 +202,8 @@ def main(argv: list[str] | None = None) -> int:
     rv = r.add_parser("validate", help="validate rule packs")
     rv.add_argument("paths", nargs="*")
     rv.set_defaults(fn=cmd_rules_validate)
+    rt = r.add_parser("test", help="run per-rule unit tests from rule-tests/")
+    rt.set_defaults(fn=cmd_rules_test)
     rg = r.add_parser("generate", help="select/generate rules for an inventory")
     src(rg)
     rg.set_defaults(fn=cmd_rules_generate)
@@ -178,6 +224,12 @@ def main(argv: list[str] | None = None) -> int:
     se = sc.add_parser("export")
     se.add_argument("--out", default=str(REPO_ROOT / "schemas"))
     se.set_defaults(fn=cmd_schemas_export)
+
+    cv = sub.add_parser("coverage", help="MITRE ATT&CK coverage").add_subparsers(dest="ccmd", required=True)
+    ce = cv.add_parser("export", help="write docs/attack-coverage.md and docs/attack-navigator-layer.json")
+    ce.add_argument("--out", default=str(REPO_ROOT / "docs"))
+    ce.add_argument("--check", action="store_true", help="exit 1 if the committed files are stale (CI)")
+    ce.set_defaults(fn=cmd_coverage_export)
 
     args = p.parse_args(argv)
     from app.core.logging import setup_logging

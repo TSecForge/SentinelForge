@@ -1,0 +1,9 @@
+rule_id: DET-WIN-010
+match:
+  - name: Invoke-WebRequest
+    event: {event_type: process_creation, process: {name: powershell.exe, command_line: "powershell -c Invoke-WebRequest -Uri http://updates.example.net/readme.txt -OutFile readme.txt"}}
+  - name: Start-BitsTransfer
+    event: {event_type: process_creation, process: {name: pwsh.exe, command_line: "pwsh -c Start-BitsTransfer -Source http://updates.example.net/f.txt"}}
+no_match:
+  - name: Local cmdlet
+    event: {event_type: process_creation, process: {name: powershell.exe, command_line: "powershell -c Get-Service W3SVC"}}

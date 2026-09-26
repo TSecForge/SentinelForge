@@ -1,0 +1,7 @@
+rule_id: DET-K8S-001
+match:
+  - name: kubectl exec
+    event: {event_type: k8s_audit, k8s: {verb: create, resource: pods, subresource: exec, namespace: prod, name: api-1}}
+no_match:
+  - name: Pod logs
+    event: {event_type: k8s_audit, k8s: {verb: get, resource: pods, subresource: log, namespace: prod, name: api-1}}

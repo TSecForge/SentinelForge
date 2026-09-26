@@ -22,8 +22,10 @@ Run both with `uvicorn app.main:app --reload` (from `backend/`) and `npm run dev
    make sense when something exists must say so. That is the core idea of the project.
 5. Use `$profile.<param>` for environment-specific values rather than hard-coding them.
 6. Validate with `python -m app.cli rules validate`.
-7. Add a test in `backend/tests/test_detection.py` with **a matching and a non-matching event**. If you add a demo
-   scenario, add it in `app/services/simulation` and list its expected rules.
+7. Add `rule-tests/<ID>.yml` with at least one **match** and one **no_match** event, including the near-miss
+   that a careless rule would catch. Run `python -m app.cli rules test`. CI fails for rules without tests.
+   Then run `python -m app.cli coverage export` and commit the regenerated `docs/attack-coverage.md`.
+   If you add a demo scenario, add it in `app/services/simulation` and list its expected rules.
 8. When you change an existing rule, **bump `version`**. The store refuses changed content under an old version.
 
 Keep rules deterministic and explainable. Every match should be explainable from the `evidence` fields.

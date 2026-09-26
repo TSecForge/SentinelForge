@@ -1,0 +1,11 @@
+rule_id: DET-WIN-001
+match:
+  - name: Word spawns PowerShell
+    event: {event_type: process_creation, process: {name: powershell.exe, parent_name: winword.exe}}
+  - name: Excel spawns pwsh
+    event: {event_type: process_creation, process: {name: pwsh.exe, parent_name: excel.exe}}
+no_match:
+  - name: PowerShell from Explorer
+    event: {event_type: process_creation, process: {name: powershell.exe, parent_name: explorer.exe}}
+  - name: Word spawns a browser
+    event: {event_type: process_creation, process: {name: msedge.exe, parent_name: winword.exe}}

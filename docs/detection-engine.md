@@ -95,6 +95,8 @@ learn.
 2. Set a new `id`, `author`, and `source: organization`.
 3. Run `sentinelforge rules validate` or `POST /api/v1/rules/validate`.
 4. Reload with `POST /api/v1/rules/reload` or the UI button, then regenerate rules for your environments.
-5. Add a test with a matching and a non-matching event (see `backend/tests/test_detection.py`).
+5. Add `rule-tests/<ID>.yml` with `match` and `no_match` cases, then run `sentinelforge rules test`.
+   Events are partial normalized events, and `repeat: N` exercises thresholds.
+6. Regenerate the ATT&CK coverage report with `sentinelforge coverage export`. CI checks that it is current.
 
 To change a rule later, **bump `version`**. The store refuses changed content under an existing version.

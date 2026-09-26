@@ -1,0 +1,20 @@
+id: DET-LNX-003
+name: Remote Script Piped Directly to a Shell
+description: >
+  curl or wget output was piped straight into a shell interpreter, running remote content without
+  saving or reviewing it.
+version: "1.0"
+author: Sujhal Gurav
+source: builtin
+platform: linux
+event_type: process_creation
+severity: high
+fidelity: medium
+category: linux_process
+selection:
+  process.command_line|re: '(curl|wget)\s[^|]*\|\s*(sudo\s+)?(ba|z|da)?sh\b'
+summary: "Remote script piped to shell on {host} by {actor.user}"
+mitre: {tactic: command-and-control, technique: T1105}
+tags: [linux, download, execution]
+false_positives:
+  - Vendor install one-liners run by administrators (still worth reviewing)

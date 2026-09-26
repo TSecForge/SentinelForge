@@ -1,0 +1,7 @@
+rule_id: DET-DOCKER-003
+match:
+  - name: Privileged container
+    event: {event_type: container_start, container: {image: "nginx:1.25", privileged: true}}
+no_match:
+  - name: Unprivileged container
+    event: {event_type: container_start, container: {image: "nginx:1.25", privileged: false}}

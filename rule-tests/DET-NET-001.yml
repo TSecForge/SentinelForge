@@ -1,0 +1,10 @@
+rule_id: DET-NET-001
+environment: windows-web-server
+match:
+  - name: External destination on port 8081
+    event: {event_type: network_connection, network: {direction: outbound, dst_ip: 198.51.100.23, dst_port: 8081}}
+no_match:
+  - name: External HTTPS
+    event: {event_type: network_connection, network: {direction: outbound, dst_ip: 198.51.100.23, dst_port: 443}}
+  - name: Internal destination
+    event: {event_type: network_connection, network: {direction: outbound, dst_ip: 10.10.30.5, dst_port: 1433}}

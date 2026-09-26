@@ -1,0 +1,10 @@
+rule_id: DET-NET-002
+environment: windows-web-server
+match:
+  - name: New listener on 4444
+    event: {event_type: network_listen, network: {dst_port: 4444, protocol: tcp}}
+no_match:
+  - name: Baseline port 443
+    event: {event_type: network_listen, network: {dst_port: 443, protocol: tcp}}
+  - name: Dynamic RPC range
+    event: {event_type: network_listen, network: {dst_port: 49700, protocol: tcp}}

@@ -41,6 +41,17 @@ def test_windows_logon_group_service():
     assert s.event_type == "service_creation" and s.service.path == "C:\\p.exe"
 
 
+def test_log_cleared_and_kerberos_ticket():
+    c = n("windows", {"EventID": 1102, "Channel": "Security", "Computer": "H",
+                      "UserData": {"LogFileCleared": {"SubjectUserName": "Eve", "SubjectDomainName": "CORP"}}})
+    assert c.event_type == "log_cleared" and c.actor.user == "eve"
+    s = n("windows", {"EventID": 104, "Channel": "System", "Computer": "H", "EventData": {"SubjectUserName": "eve", "Channel": "Application"}})
+    assert s.event_type == "log_cleared" and "Application" in s.message
+    k = n("windows", {"EventID": 4769, "Computer": "DC1", "EventData": {"TargetUserName": "jdoe@CORP.EXAMPLE", "ServiceName": "svc-sql",
+                                                                         "TicketEncryptionType": "0x17", "Status": "0x0", "IpAddress": "::ffff:10.1.1.5"}})
+    assert k.event_type == "kerberos_service_ticket" and k.auth.method == "0x17" and k.service.name == "svc-sql" and k.auth.outcome == "success"
+
+
 def test_scheduled_task_command_extracted():
     t = n("windows", {"EventID": 4698, "Computer": "H", "EventData": {"TaskName": "\\T",
           "TaskContent": "<Task><Actions><Exec><Command>cmd.exe</Command><Arguments>/c echo hi</Arguments></Exec></Actions></Task>"}})

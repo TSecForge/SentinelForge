@@ -1,0 +1,7 @@
+rule_id: DET-WIN-012
+match:
+  - name: WinRM host runs net.exe
+    event: {event_type: process_creation, process: {name: net.exe, parent_name: wsmprovhost.exe}}
+no_match:
+  - name: WinRM host runs PowerShell cmdlet host
+    event: {event_type: process_creation, process: {name: conhost.exe, parent_name: wsmprovhost.exe}}

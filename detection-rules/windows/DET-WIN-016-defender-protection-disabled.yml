@@ -1,0 +1,25 @@
+id: DET-WIN-016
+name: Microsoft Defender Protection Disabled or Excluded
+description: >
+  PowerShell was used to turn off a Defender protection feature or add a scan exclusion.
+version: "1.0"
+author: Sujhal Gurav
+source: builtin
+platform: windows
+event_type: process_creation
+severity: high
+fidelity: high
+category: windows_defense_evasion
+applies_when:
+  technologies: [PowerShell]
+selection:
+  process.name: [powershell.exe, pwsh.exe]
+condition:
+  process.command_line|re:
+    - 'set-mppreference\s.*-disable(realtimemonitoring|behaviormonitoring|ioavprotection|scriptscanning)\s+(\$true|1)'
+    - 'add-mppreference\s.*-exclusion(path|process|extension)\s'
+summary: "Defender configuration weakened on {host} by {actor.user}"
+mitre: {tactic: defense-evasion, technique: T1562.001}
+tags: [windows, defender, defense-evasion]
+false_positives:
+  - Approved exclusions deployed by endpoint management (usually via GPO/Intune, not interactive PowerShell)

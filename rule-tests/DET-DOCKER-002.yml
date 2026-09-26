@@ -1,0 +1,10 @@
+rule_id: DET-DOCKER-002
+environment: windows-web-server
+match:
+  - name: Publishes an unexpected port
+    event: {event_type: container_start, container: {image: "nginx:1.25", host_ports: [8443, 2375]}}
+no_match:
+  - name: Only baseline ports
+    event: {event_type: container_start, container: {image: "nginx:1.25", host_ports: [8443]}}
+  - name: No published ports
+    event: {event_type: container_start, container: {image: "nginx:1.25"}}

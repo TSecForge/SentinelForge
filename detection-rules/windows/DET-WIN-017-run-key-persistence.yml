@@ -1,0 +1,21 @@
+id: DET-WIN-017
+name: Registry Run Key Added With reg.exe
+description: >
+  reg.exe added a value under a CurrentVersion\Run or RunOnce key, which starts a program at every logon.
+version: "1.0"
+author: Sujhal Gurav
+source: builtin
+platform: windows
+event_type: process_creation
+severity: medium
+fidelity: medium
+category: windows_persistence
+selection:
+  process.name: reg.exe
+condition:
+  process.command_line|re: 'reg(\.exe)?\s+add\s+.*\\currentversion\\run(once)?(\s|"|$)'
+summary: "Run key persistence added on {host}: {process.command_line}"
+mitre: {tactic: persistence, technique: T1547.001}
+tags: [windows, registry, persistence]
+false_positives:
+  - Software installers registering auto-start helpers

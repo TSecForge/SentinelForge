@@ -1,5 +1,10 @@
 # SentinelForge
 
+[![CI](https://github.com/TSecForge/SentinelForge/actions/workflows/ci.yml/badge.svg)](https://github.com/TSecForge/SentinelForge/actions/workflows/ci.yml)
+![rules](https://img.shields.io/badge/detection%20rules-32-orange)
+![ATT&CK](https://img.shields.io/badge/ATT%26CK%20techniques-24-red)
+![license](https://img.shields.io/badge/license-Apache--2.0-blue)
+
 **Agentless Environment-Aware Detection Engineering & Event Intelligence Platform**
 
 SentinelForge discovers the security-relevant characteristics of a host without installing a custom
@@ -14,6 +19,17 @@ DISCOVER  →  PROFILE  →  GENERATE / SELECT RULES  →  DETECT  →  ENRICH  
 > **Status: MVP / prototype.** It demonstrates an architecture. It is not a complete detection
 > capability, it will produce false positives and negatives, and it is not hardened for enterprise use.
 > See [Limitations](#limitations).
+
+![Dashboard](docs/images/dashboard.png)
+
+<table><tr>
+<td><img src="docs/images/environment.png" alt="Environment profile and topology"></td>
+<td><img src="docs/images/detection.png" alt="Detection detail"></td>
+</tr><tr>
+<td align="center">Environment profile &amp; topology</td><td align="center">Detection with evidence, observables and context</td>
+</tr></table>
+
+*All data in the screenshots is simulated demo telemetry.*
 
 ---
 
@@ -107,8 +123,11 @@ More detail: [docs/architecture.md](docs/architecture.md).
     `$profile.internal_cidrs`, `$profile.known_admins`, `$profile.container_ports`).
   - A validation gate that must pass before any rule becomes active.
   - Versioned assignments, and the reason each rule was or wasn't activated.
-- **25 rules** (24 built-in plus 1 example organization rule) covering Windows/PowerShell, IIS, RDP, WinRM,
-  accounts, persistence, network, Docker, Kubernetes, and Linux.
+- **32 rules** (31 built-in plus 1 example organization rule) mapped to 24 ATT&CK techniques. They cover
+  Windows/PowerShell, IIS, RDP, WinRM, Kerberos, accounts, persistence, defense evasion, discovery, network,
+  Docker, Kubernetes, and Linux. See the [coverage matrix](docs/attack-coverage.md).
+- **Detection-as-code**: every rule has unit tests (events that must and must not fire it) in `rule-tests/`, and
+  CI runs them on every push. A rule without tests, or a stale ATT&CK coverage report, fails the build.
 - **Safe, deterministic evaluator**: no `eval`, a fixed operator table, dict-only field access,
   bounded depth/size, and refusal of YAML anchors and Python tags. Supports threshold rules (N events in T seconds per group).
 - **Event normalization** for Windows Security/System/Sysmon records, Linux (JSON and sshd syslog), Docker
@@ -120,7 +139,7 @@ More detail: [docs/architecture.md](docs/architecture.md).
 - **SIEM gateway**: generic webhook, Splunk HEC, and Elasticsearch/OpenSearch. Every delivery attempt is recorded.
   A built-in webhook receiver lets you demo forwarding without a SIEM.
 - **Event reduction metrics** measured on the actual workload.
-- **Demo mode** with simulated, clearly labelled telemetry and 21 attack scenarios.
+- **Demo mode** with simulated, clearly labelled telemetry and 27 attack scenarios.
 - **Dashboard** covering Dashboard, Environments (with topology), Rules (YAML, applicability, validation), Events,
   Detections, SIEM, and About.
 - **Open-source extension points**: rule packs, plugins (SIEM adapters, event parsers, observable extractors),
@@ -168,8 +187,8 @@ docker compose up --build
 2. **Create Demo Environment** creates `WEB-SRV-01` (Windows Server 2022, IIS, RDP, WinRM, Docker with 7
    containers). It is marked **SIMULATED** everywhere.
 3. Review the **Environment Profile**: technologies, environment types, exposed services, and risk.
-4. **Generate Rules** activates the rules this host needs. With the shipped packs that is 20 active and 5 not applicable
-   (Kubernetes and Linux), each with a reason.
+4. **Generate Rules** activates the rules this host needs. With the shipped packs that is 24 active and 8 not applicable
+   (Kubernetes, Linux, and the domain-controller-only Kerberos rule), each with a reason.
 5. **Simulate Security Event** runs the default scenario, *Office application spawning PowerShell*. It produces
    **HIGH · Office Application Spawning PowerShell** (plus *PowerShell Downloading Remote Content*).
 6. Click the detection to see the host, timestamp, rule, description, severity, MITRE technique, observables,
@@ -179,8 +198,8 @@ docker compose up --build
 
 The same flow from the CLI: `sentinelforge demo --benign 10000`.
 
-Measured on the development machine (SQLite, synthetic workload): 10,044 events received, 17 matched,
-18 detection documents, 99.83% of events not forwarded. Every scenario fired its expected rule and no
+Measured on the development machine (SQLite, synthetic workload): 10,051 events received, 21 matched,
+22 detection documents, 99.79% of events not forwarded. Every scenario fired its expected rule and no
 benign event matched. That describes this synthetic workload only. Real telemetry is noisier.
 
 ## Windows discovery
@@ -238,6 +257,32 @@ Operators: `eq` (default), `contains`, `startswith`, `endswith`, `re`, `not_in`,
 Organization rules go in `custom-rules/`, or any directory listed in `RULE_PATHS`. The core engine does not need to change. Validate them with
 `sentinelforge rules validate`, then reload with **Rules → Reload rule packs**.
 
+### Detection-as-code
+
+Each rule has a test file in `rule-tests/`:
+
+```yaml
+rule_id: DET-WIN-004
+environment: windows-web-server        # profile used to fill $profile.* values
+match:
+  - name: New account added to Administrators
+    event: {event_type: user_group_change, group: {name: Administrators, member: svc-support, action: added}}
+no_match:
+  - name: Known admin re-added
+    event: {event_type: user_group_change, group: {name: Administrators, member: backup-admin, action: added}}
+```
+
+Test events are validated against the normalized event schema, so a misspelled field fails the test instead of
+silently never matching. `repeat: N` exercises threshold rules. CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml))
+runs on every push:
+
+1. `rules validate`: schema, safe YAML, and compile checks
+2. `rules test`: 32 rules, 94 match / no-match cases
+3. `coverage export --check`: the [ATT&CK coverage matrix](docs/attack-coverage.md) and
+   [Navigator layer](docs/attack-navigator-layer.json) must match the rules
+4. the backend test suite and the frontend type-check/build
+5. a real run of the agentless collector on a Windows runner
+
 ## Event pipeline
 
 `POST /api/v1/events` or `/api/v1/events/batch` with `{"source": "windows|linux|docker|kubernetes|generic", "data": {...}}`.
@@ -288,6 +333,8 @@ pip install -e backend        # provides the `sentinelforge` command (or: python
 sentinelforge discovery --save                 # live local discovery
 sentinelforge profile --template windows-web-server
 sentinelforge rules validate
+sentinelforge rules test                       # per-rule match / no-match unit tests
+sentinelforge coverage export                  # docs/attack-coverage.md + Navigator layer
 sentinelforge rules generate --file inventory.json
 sentinelforge events simulate --scenario office_powershell
 sentinelforge demo --benign 10000
@@ -330,7 +377,7 @@ Threat model: [docs/threat-model.md](docs/threat-model.md). Reporting vulnerabil
 
 ## Limitations
 
-- **Coverage**: 25 rules is a demonstration set, not complete detection coverage. There will be false positives
+- **Coverage**: 32 rules is a demonstration set, not complete detection coverage. There will be false positives
   and false negatives.
 - **Telemetry**: discovery is agentless, but continuous collection (WEF, syslog forwarding) is not implemented yet.
   Events must be pushed to the API.
@@ -371,6 +418,7 @@ frontend/           React + Vite + TypeScript + Tailwind dashboard
 collectors/windows/ agentless PowerShell discovery collector
 detection-rules/    built-in rule packs (windows, network, docker, kubernetes, linux)
 custom-rules/       organization/user rule packs (loaded alongside built-ins)
+rule-tests/         per-rule unit tests (match / no-match events), run in CI
 plugins/            example plugin (stdout SIEM adapter, parser, extractor)
 schemas/            JSON Schemas (inventory, profile, rule, normalized event, detection event)
 sample-data/        synthetic environments, events and an example detection

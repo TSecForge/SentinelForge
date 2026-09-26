@@ -1,0 +1,11 @@
+rule_id: DET-WIN-017
+match:
+  - name: HKCU Run value
+    event: {event_type: process_creation, process: {name: reg.exe, command_line: "reg add HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run /v Updater /d C:\\Users\\Public\\u.exe"}}
+  - name: HKLM RunOnce value
+    event: {event_type: process_creation, process: {name: reg.exe, command_line: "reg.exe add \"HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce\" /v x /d y"}}
+no_match:
+  - name: Query a Run key
+    event: {event_type: process_creation, process: {name: reg.exe, command_line: "reg query HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run"}}
+  - name: Unrelated key
+    event: {event_type: process_creation, process: {name: reg.exe, command_line: "reg add HKCU\\Software\\Vendor /v Theme /d dark"}}

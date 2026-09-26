@@ -1,0 +1,7 @@
+rule_id: ORG-WIN-001
+match:
+  - name: Script from Temp
+    event: {event_type: process_creation, process: {name: powershell.exe, command_line: "powershell -File C:\\Windows\\Temp\\setup.ps1"}}
+no_match:
+  - name: Script from Ops
+    event: {event_type: process_creation, process: {name: powershell.exe, command_line: "powershell -File C:\\Ops\\setup.ps1"}}

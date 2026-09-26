@@ -1,0 +1,9 @@
+rule_id: DET-WIN-003
+match:
+  - name: mshta spawns PowerShell
+    event: {event_type: process_creation, process: {name: powershell.exe, parent_name: mshta.exe}}
+  - name: WMI provider host spawns PowerShell
+    event: {event_type: process_creation, process: {name: powershell.exe, parent_name: wmiprvse.exe}}
+no_match:
+  - name: Explorer parent
+    event: {event_type: process_creation, process: {name: powershell.exe, parent_name: explorer.exe}}

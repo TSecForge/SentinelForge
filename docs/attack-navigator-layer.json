@@ -1,0 +1,188 @@
+{
+  "name": "SentinelForge detection coverage",
+  "versions": {
+    "layer": "4.5",
+    "navigator": "5.1.0"
+  },
+  "domain": "enterprise-attack",
+  "description": "Generated from SentinelForge rule packs. Score = highest severity of the rules mapped to the technique.",
+  "gradient": {
+    "colors": [
+      "#fde68a",
+      "#f97316",
+      "#dc2626"
+    ],
+    "minValue": 1,
+    "maxValue": 4
+  },
+  "techniques": [
+    {
+      "techniqueID": "T1021.001",
+      "tactic": "lateral-movement",
+      "score": 3,
+      "comment": "DET-WIN-007",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1021.006",
+      "tactic": "lateral-movement",
+      "score": 2,
+      "comment": "DET-WIN-012",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1046",
+      "tactic": "discovery",
+      "score": 2,
+      "comment": "DET-NET-003",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1053.005",
+      "tactic": "persistence",
+      "score": 2,
+      "comment": "DET-WIN-006",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1059.001",
+      "tactic": "execution",
+      "score": 3,
+      "comment": "DET-WIN-001, DET-WIN-002, DET-WIN-003",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1059.004",
+      "tactic": "execution",
+      "score": 4,
+      "comment": "DET-LNX-002",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1070.001",
+      "tactic": "defense-evasion",
+      "score": 3,
+      "comment": "DET-WIN-014",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1087",
+      "tactic": "discovery",
+      "score": 1,
+      "comment": "DET-WIN-018",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1098",
+      "tactic": "privilege-escalation",
+      "score": 3,
+      "comment": "DET-K8S-003, DET-WIN-004",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1105",
+      "tactic": "command-and-control",
+      "score": 3,
+      "comment": "DET-LNX-003, DET-WIN-010",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1110",
+      "tactic": "credential-access",
+      "score": 2,
+      "comment": "DET-WIN-008",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1110.001",
+      "tactic": "credential-access",
+      "score": 2,
+      "comment": "DET-LNX-001",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1136.001",
+      "tactic": "persistence",
+      "score": 1,
+      "comment": "DET-WIN-013",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1218",
+      "tactic": "defense-evasion",
+      "score": 3,
+      "comment": "DET-WIN-009",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1505.003",
+      "tactic": "persistence",
+      "score": 4,
+      "comment": "DET-WIN-011",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1543.003",
+      "tactic": "persistence",
+      "score": 3,
+      "comment": "DET-WIN-005",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1547.001",
+      "tactic": "persistence",
+      "score": 2,
+      "comment": "DET-WIN-017",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1552.007",
+      "tactic": "credential-access",
+      "score": 2,
+      "comment": "DET-K8S-004",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1558.003",
+      "tactic": "credential-access",
+      "score": 2,
+      "comment": "DET-WIN-015",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1562.001",
+      "tactic": "defense-evasion",
+      "score": 3,
+      "comment": "DET-WIN-016",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1571",
+      "tactic": "command-and-control",
+      "score": 2,
+      "comment": "DET-NET-001, DET-NET-002",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1609",
+      "tactic": "execution",
+      "score": 2,
+      "comment": "DET-K8S-001",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1610",
+      "tactic": "execution",
+      "score": 3,
+      "comment": "DET-DOCKER-001, DET-DOCKER-002",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1611",
+      "tactic": "privilege-escalation",
+      "score": 3,
+      "comment": "DET-DOCKER-003, DET-K8S-002",
+      "enabled": true
+    }
+  ]
+}

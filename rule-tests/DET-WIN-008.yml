@@ -1,0 +1,12 @@
+rule_id: DET-WIN-008
+match:
+  - name: Five failures from one source
+    repeat: 5
+    event: {event_type: authentication, auth: {outcome: failure}, network: {src_ip: 203.0.113.77}}
+no_match:
+  - name: Four failures stay below threshold
+    repeat: 4
+    event: {event_type: authentication, auth: {outcome: failure}, network: {src_ip: 203.0.113.77}}
+  - name: Successful logons
+    repeat: 10
+    event: {event_type: authentication, auth: {outcome: success}, network: {src_ip: 203.0.113.77}}

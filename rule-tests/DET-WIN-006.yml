@@ -1,0 +1,9 @@
+rule_id: DET-WIN-006
+match:
+  - name: Task runs hidden PowerShell
+    event: {event_type: scheduled_task_creation, task: {name: "\\Updater", command: "powershell.exe -w hidden -File C:\\x.ps1"}}
+  - name: Task binary in AppData
+    event: {event_type: scheduled_task_creation, task: {name: "\\Sync", command: "C:\\Users\\bob\\AppData\\Roaming\\sync.exe"}}
+no_match:
+  - name: Vendor task
+    event: {event_type: scheduled_task_creation, task: {name: "\\Vendor", command: "C:\\Program Files\\Vendor\\update.exe /check"}}

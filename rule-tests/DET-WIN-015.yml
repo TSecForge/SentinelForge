@@ -1,0 +1,11 @@
+rule_id: DET-WIN-015
+match:
+  - name: RC4 ticket for a user service account
+    event: {event_type: kerberos_service_ticket, auth: {outcome: success, method: "0x17"}, service: {name: svc-sql}, actor: {user: jdoe}}
+no_match:
+  - name: AES ticket
+    event: {event_type: kerberos_service_ticket, auth: {outcome: success, method: "0x12"}, service: {name: svc-sql}}
+  - name: RC4 ticket for a computer account
+    event: {event_type: kerberos_service_ticket, auth: {outcome: success, method: "0x17"}, service: {name: "WEB-SRV-01$"}}
+  - name: RC4 ticket for krbtgt
+    event: {event_type: kerberos_service_ticket, auth: {outcome: success, method: "0x17"}, service: {name: krbtgt}}

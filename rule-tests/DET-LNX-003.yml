@@ -1,0 +1,11 @@
+rule_id: DET-LNX-003
+match:
+  - name: curl piped to sh
+    event: {event_type: process_creation, process: {command_line: "curl -fsSL https://get.example.net/install.sh | sh"}}
+  - name: wget piped to sudo bash
+    event: {event_type: process_creation, process: {command_line: "wget -qO- https://get.example.net/i.sh | sudo bash"}}
+no_match:
+  - name: Download to file
+    event: {event_type: process_creation, process: {command_line: "curl -o install.sh https://get.example.net/install.sh"}}
+  - name: curl piped to jq
+    event: {event_type: process_creation, process: {command_line: "curl -s http://10.10.30.5/health | jq ."}}

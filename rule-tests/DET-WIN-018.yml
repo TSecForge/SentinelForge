@@ -1,0 +1,12 @@
+rule_id: DET-WIN-018
+match:
+  - name: Four discovery commands by one user
+    repeat: 4
+    event: {event_type: process_creation, process: {name: whoami.exe}, actor: {user: jdoe}}
+no_match:
+  - name: Three commands stay below threshold
+    repeat: 3
+    event: {event_type: process_creation, process: {name: ipconfig.exe}, actor: {user: jdoe}}
+  - name: Other programs
+    repeat: 10
+    event: {event_type: process_creation, process: {name: notepad.exe}, actor: {user: jdoe}}

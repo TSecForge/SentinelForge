@@ -1,0 +1,9 @@
+rule_id: DET-WIN-005
+match:
+  - name: Service binary in Users\Public
+    event: {event_type: service_creation, service: {name: UpdaterSvc, path: "C:\\Users\\Public\\updater.exe"}}
+  - name: Service runs cmd /c
+    event: {event_type: service_creation, service: {name: TmpSvc, path: "cmd.exe /c echo hi"}}
+no_match:
+  - name: Program Files service
+    event: {event_type: service_creation, service: {name: VendorSvc, path: "C:\\Program Files\\Vendor\\svc.exe"}}

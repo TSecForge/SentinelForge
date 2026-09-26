@@ -1,0 +1,9 @@
+rule_id: DET-WIN-011
+match:
+  - name: w3wp spawns cmd
+    event: {event_type: process_creation, process: {name: cmd.exe, parent_name: w3wp.exe, command_line: "cmd.exe /c whoami"}}
+no_match:
+  - name: w3wp spawns csc compiler
+    event: {event_type: process_creation, process: {name: csc.exe, parent_name: w3wp.exe}}
+  - name: cmd from explorer
+    event: {event_type: process_creation, process: {name: cmd.exe, parent_name: explorer.exe}}

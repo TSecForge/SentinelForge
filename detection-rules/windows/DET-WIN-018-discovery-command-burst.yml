@@ -1,0 +1,24 @@
+id: DET-WIN-018
+name: Burst of Host Discovery Commands
+description: >
+  Four or more built-in discovery utilities (whoami, net, nltest, systeminfo, ipconfig, quser, tasklist)
+  run by the same user within two minutes - typical of hands-on-keyboard reconnaissance.
+version: "1.0"
+author: Sujhal Gurav
+source: builtin
+platform: windows
+event_type: process_creation
+severity: low
+fidelity: low
+category: windows_process
+selection:
+  process.name: [whoami.exe, net.exe, net1.exe, nltest.exe, systeminfo.exe, ipconfig.exe, quser.exe, tasklist.exe]
+threshold:
+  count: 4
+  window_seconds: 120
+  group_by: [host, actor.user]
+summary: "Discovery command burst on {host} by {actor.user} (last: {process.name})"
+mitre: {tactic: discovery, technique: T1087}
+tags: [windows, discovery]
+false_positives:
+  - Helpdesk troubleshooting sessions and inventory scripts

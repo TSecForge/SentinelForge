@@ -1,0 +1,9 @@
+rule_id: DET-LNX-001
+match:
+  - name: Five SSH failures
+    repeat: 5
+    event: {event_type: authentication, auth: {outcome: failure, method: ssh}, network: {src_ip: 203.0.113.80}}
+no_match:
+  - name: Four SSH failures
+    repeat: 4
+    event: {event_type: authentication, auth: {outcome: failure, method: ssh}, network: {src_ip: 203.0.113.80}}

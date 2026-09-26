@@ -106,6 +106,21 @@ def parse_windows(d: dict) -> dict:
                        "method": _clean(ed.get("AuthenticationPackageName"))}
         out["network"] = {"src_ip": _clean(ed.get("IpAddress")), "src_port": _int(ed.get("IpPort")), "direction": "inbound"}
         out["process"] = {"name": basename(ed.get("ProcessName"))}
+    elif eid == 4769:
+        tu, td = _user(ed.get("TargetDomainName"), ed.get("TargetUserName"))
+        out["event_type"] = "kerberos_service_ticket"
+        out["actor"] = {"user": tu, "domain": td}
+        out["service"] = {"name": _clean(ed.get("ServiceName"))}
+        out["auth"] = {"outcome": "success" if str(ed.get("Status", "0x0")).lower() in ("0x0", "0") else "failure",
+                       "method": (_clean(ed.get("TicketEncryptionType")) or "").lower() or None}
+        out["network"] = {"src_ip": _clean(ed.get("IpAddress")), "direction": "inbound"}
+    elif (eid == 1102 and "security" in (channel or "security")) or (eid == 104 and channel == "system"):
+        ud = d.get("UserData") or {}
+        sub = next((v for v in ud.values() if isinstance(v, dict)), ed)
+        u, dom = _user(sub.get("SubjectDomainName"), sub.get("SubjectUserName"))
+        out["event_type"] = "log_cleared"
+        out["actor"] = {"user": u, "domain": dom}
+        out["message"] = f"{'Security' if eid == 1102 else _clean(sub.get('Channel')) or 'System'} event log cleared"
     elif eid == 4720:
         out["event_type"] = "user_account_created"
         out["actor"]["target_user"] = (_clean(ed.get("TargetUserName")) or "").lower() or None

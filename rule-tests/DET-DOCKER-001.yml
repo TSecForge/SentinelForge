@@ -1,0 +1,8 @@
+rule_id: DET-DOCKER-001
+environment: windows-web-server
+match:
+  - name: Image not present at discovery
+    event: {event_type: container_start, container: {image: "registry.example.net/tools/netshell:latest"}}
+no_match:
+  - name: Approved image
+    event: {event_type: container_start, container: {image: "nginx:1.25"}}

@@ -1,0 +1,11 @@
+rule_id: DET-WIN-002
+match:
+  - name: -EncodedCommand with base64
+    event: {event_type: process_creation, process: {name: powershell.exe, command_line: "powershell.exe -NoProfile -EncodedCommand VwByAGkAdABlAC0ATwB1AHQAcAB1AHQAIAAnAGgAaQAnAA=="}}
+  - name: -enc abbreviation
+    event: {event_type: process_creation, process: {name: powershell.exe, command_line: "powershell -enc VwByAGkAdABlAC0ATwB1AHQAcAB1AHQAIAAnAGgAaQAnAA=="}}
+no_match:
+  - name: -ExecutionPolicy is not an encoded command
+    event: {event_type: process_creation, process: {name: powershell.exe, command_line: "powershell.exe -ExecutionPolicy Bypass -File C:\\Ops\\x.ps1"}}
+  - name: Plain script
+    event: {event_type: process_creation, process: {name: powershell.exe, command_line: "powershell.exe -File C:\\Ops\\healthcheck.ps1"}}

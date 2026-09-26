@@ -1,0 +1,7 @@
+rule_id: DET-LNX-002
+match:
+  - name: Redirect to /dev/tcp
+    event: {event_type: process_creation, process: {command_line: "echo ping > /dev/tcp/198.51.100.23/80"}}
+no_match:
+  - name: Ordinary bash
+    event: {event_type: process_creation, process: {command_line: "bash /opt/app/start.sh"}}

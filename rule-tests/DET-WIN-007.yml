@@ -1,0 +1,12 @@
+rule_id: DET-WIN-007
+environment: windows-web-server
+match:
+  - name: RDP logon from external address
+    event: {event_type: authentication, auth: {outcome: success, logon_type: 10}, network: {src_ip: 203.0.113.50}}
+no_match:
+  - name: RDP logon from internal address
+    event: {event_type: authentication, auth: {outcome: success, logon_type: 10}, network: {src_ip: 10.10.20.50}}
+  - name: Network logon from external address
+    event: {event_type: authentication, auth: {outcome: success, logon_type: 3}, network: {src_ip: 203.0.113.50}}
+  - name: Failed RDP logon
+    event: {event_type: authentication, auth: {outcome: failure, logon_type: 10}, network: {src_ip: 203.0.113.50}}

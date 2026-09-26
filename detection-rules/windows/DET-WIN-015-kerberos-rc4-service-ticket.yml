@@ -1,0 +1,28 @@
+id: DET-WIN-015
+name: Kerberos Service Ticket Requested With RC4
+description: >
+  A domain controller issued a service ticket (4769) using RC4 encryption (0x17) for a user service
+  account. Modern domains use AES; RC4 tickets for service accounts are a common Kerberoasting indicator.
+version: "1.0"
+author: Sujhal Gurav
+source: builtin
+platform: windows
+event_type: kerberos_service_ticket
+severity: medium
+fidelity: medium
+category: authentication
+applies_when:
+  environment_types: [domain_controller]
+selection:
+  auth.outcome: success
+  auth.method: "0x17"
+condition:
+  not:
+    any:
+      - service.name|endswith: "$"
+      - service.name: krbtgt
+summary: "RC4 service ticket for {service.name} requested by {actor.user} from {network.src_ip}"
+mitre: {tactic: credential-access, technique: T1558.003}
+tags: [windows, kerberos, active-directory]
+false_positives:
+  - Legacy applications or trusts that still require RC4

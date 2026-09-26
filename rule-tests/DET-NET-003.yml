@@ -1,0 +1,12 @@
+rule_id: DET-NET-003
+match:
+  - name: Fifteen blocked inbound attempts
+    repeat: 15
+    event: {event_type: network_connection, network: {direction: inbound, outcome: blocked, src_ip: 198.51.100.99}}
+no_match:
+  - name: Allowed inbound connections
+    repeat: 30
+    event: {event_type: network_connection, network: {direction: inbound, outcome: allowed, src_ip: 198.51.100.99}}
+  - name: Below threshold
+    repeat: 14
+    event: {event_type: network_connection, network: {direction: inbound, outcome: blocked, src_ip: 198.51.100.99}}
