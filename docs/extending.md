@@ -34,7 +34,7 @@ your product's UI.
 ## Rule packs
 
 ```env
-RULE_PATHS=./detection-rules,./custom-rules,/opt/acme/rules
+RULE_PATHS=builtin,./custom-rules,/opt/acme/rules    # builtin = packs shipped in the sentinelforge package
 ```
 
 Every `*.yml` / `*.yaml` under these directories is loaded recursively. Use `source: organization`, `user`, or
@@ -72,7 +72,7 @@ that fails to import is logged (`plugin.failed`) and skipped. `GET /api/v1/about
 ## Collectors
 
 Collectors are external. Anything that produces inventory schema 1.0 (`schemas/inventory.schema.json`) can
-feed SentinelForge through `POST /api/v1/discovery/run {"mode":"import"}` or `sentinelforge discovery --file`.
+feed SentinelForge through `POST /api/v1/discovery/run {"mode":"import"}` or `sentinelforge-server discovery --file ... --save`.
 That covers Ansible facts converters, an osquery export, a Linux shell script, or a CMDB export.
 
 ## Dashboard

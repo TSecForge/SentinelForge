@@ -3,7 +3,7 @@
 import json
 from collections import defaultdict
 
-from app.services.rules.loader import LoadedRule
+from sentinelforge.rules.loader import LoadedRule
 
 TACTIC_ORDER = ["reconnaissance", "resource-development", "initial-access", "execution", "persistence",
                 "privilege-escalation", "defense-evasion", "credential-access", "discovery", "lateral-movement",

@@ -14,7 +14,7 @@ from app.core.logging import get_logger, setup_logging
 from app.core.security import RateLimiter, require_api_key
 from app.db.session import SessionLocal, init_db
 from app.plugins import load_plugins
-from app.services import normalization  # noqa: F401  (registers built-in parsers)
+import sentinelforge.normalize  # noqa: F401  (registers built-in parsers)
 from app.services.rules import sync_rule_store
 from app.services.siem import gateway  # noqa: F401  (registers built-in SIEM adapters)
 
@@ -84,3 +84,4 @@ app.include_router(about.router, prefix="/api/v1")  # public: branding + attribu
 protected = [Depends(require_api_key)]
 for r in (discovery, environments, rules, events, detections, siem, dashboard, demo):
     app.include_router(r.router, prefix="/api/v1", dependencies=protected)
+app.include_router(events.ingest_router, prefix="/api/v1", dependencies=protected)

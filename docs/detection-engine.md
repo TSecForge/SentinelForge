@@ -1,8 +1,8 @@
 # Detection engine and rule format
 
 Rules are **data, not code**. A YAML rule is parsed with `yaml.safe_load` (after refusing anchors and aliases),
-validated by a strict Pydantic schema (`backend/app/schemas/rule.py`, `extra="forbid"`), and compiled into a
-tree of predicates built from a fixed operator table (`backend/app/services/rules/evaluator.py`).
+validated by a strict Pydantic schema (`src/sentinelforge/schemas/rule.py`, `extra="forbid"`), and compiled into a
+tree of predicates built from a fixed operator table (`src/sentinelforge/rules/evaluator.py`).
 Nothing in a rule is evaluated as Python.
 
 ## Rule fields

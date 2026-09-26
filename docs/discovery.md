@@ -79,7 +79,7 @@ In development, a full local collection on Windows 11 took about 23 seconds. It 
 
 ## Inventory schema
 
-Version `1.0`: `backend/app/schemas/inventory.py`, exported to `schemas/inventory.schema.json`.
+Version `1.0`: `src/sentinelforge/schemas/inventory.py`, exported to `schemas/inventory.schema.json`.
 
 The parser treats collector output as untrusted:
 - unknown keys are dropped

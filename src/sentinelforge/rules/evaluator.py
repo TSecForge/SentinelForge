@@ -20,8 +20,8 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
 
-from app.schemas.rule import FIELD_PATH, RuleDefinition
-from app.utils import get_path
+from sentinelforge.schemas.rule import FIELD_PATH, RuleDefinition
+from sentinelforge._util import get_path
 
 MAX_DEPTH = 8
 MAX_NODES = 256

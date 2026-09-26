@@ -26,7 +26,8 @@ class Settings(BaseSettings):
     max_batch_events: int = 20000
 
     # --- rules / plugins ---
-    rule_paths: str = f"{(REPO_ROOT / 'detection-rules').as_posix()},{(REPO_ROOT / 'custom-rules').as_posix()}"
+    # "builtin" = the rule packs shipped with the sentinelforge library
+    rule_paths: str = f"builtin,{(REPO_ROOT / 'custom-rules').as_posix()}"
     plugin_paths: str = ""  # comma-separated directories containing plugin packages
     plugins: str = ""  # comma-separated plugin module names to load from plugin_paths
     auto_activate_rules: bool = True

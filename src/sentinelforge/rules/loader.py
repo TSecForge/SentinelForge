@@ -6,9 +6,9 @@ from pathlib import Path
 import yaml
 from pydantic import ValidationError
 
-from app.schemas.environment import RuleParameters
-from app.schemas.rule import RuleDefinition, RuleValidationResult
-from app.services.rules.evaluator import RuleCompileError, compile_rule, find_profile_refs, resolve_profile_refs
+from sentinelforge.schemas.profile import RuleParameters
+from sentinelforge.schemas.rule import RuleDefinition, RuleValidationResult
+from sentinelforge.rules.evaluator import RuleCompileError, compile_rule, find_profile_refs, resolve_profile_refs
 
 MAX_RULE_BYTES = 64 * 1024
 ALLOWED_PROFILE_REFS = set(RuleParameters.model_fields)
@@ -70,13 +70,21 @@ def resolve_template(defn: RuleDefinition, params: dict) -> RuleDefinition:
 
 
 def load_rule_paths(paths: list[str]) -> LoadReport:
+    """Load rules from directories (recursive) or single files. "builtin" means the packs shipped with SentinelForge."""
+    from sentinelforge.rules import builtin_rules_path
+
     report = LoadReport()
     seen: dict[tuple[str, str], str] = {}
     for base in paths:
-        root = Path(base)
-        if not root.is_dir():
+        root = builtin_rules_path() if base == "builtin" else Path(base)
+        if root.is_file():
+            files = [root]
+        elif root.is_dir():
+            files = sorted([*root.rglob("*.yml"), *root.rglob("*.yaml")])
+        else:
+            report.errors[str(root)] = ["rule path does not exist"]
             continue
-        for f in sorted([*root.rglob("*.yml"), *root.rglob("*.yaml")]):
+        for f in files:
             text = f.read_text(encoding="utf-8")
             defn, result = validate_rule_text(text)
             if not defn:

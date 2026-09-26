@@ -9,12 +9,16 @@ from fastapi import Header, HTTPException, Request, status
 from app.core.config import get_settings
 
 
-def require_api_key(x_api_key: str | None = Header(default=None)) -> None:
+def require_api_key(x_api_key: str | None = Header(default=None), authorization: str | None = Header(default=None)) -> None:
+    """X-API-Key header, or `Authorization: Bearer <key>` (what kube-apiserver audit webhooks can send)."""
     expected = get_settings().api_key
     if expected is None or not expected.get_secret_value():
         return  # auth disabled (local development default)
-    if not x_api_key or not hmac.compare_digest(x_api_key, expected.get_secret_value()):
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "invalid or missing X-API-Key")
+    supplied = x_api_key
+    if not supplied and authorization and authorization.lower().startswith("bearer "):
+        supplied = authorization[7:].strip()
+    if not supplied or not hmac.compare_digest(supplied, expected.get_secret_value()):
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "invalid or missing API key")
 
 
 class RateLimiter:

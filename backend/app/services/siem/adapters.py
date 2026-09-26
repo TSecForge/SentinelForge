@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 import httpx
 
 from app.core.config import Settings
-from app.plugins import registry
+from sentinelforge.registry import registry
 
 
 def redact_url(url: str) -> str:

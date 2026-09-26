@@ -2,12 +2,15 @@
 
 import pytest
 
-from app.core.config import get_settings
-from app.services.rules.loader import load_rule_paths
-from app.services.rules.testing import RuleTestFile, load_test_files, run_all, run_rule_test
+from sentinelforge.rules.loader import load_rule_paths
+from sentinelforge.rules.testing import RuleTestFile, load_test_files, run_all, run_rule_test
 
+from app.core.config import REPO_ROOT, get_settings
+
+TESTS_DIR = REPO_ROOT / "rule-tests"
+INVENTORIES = [REPO_ROOT / "sample-data" / "environments"]
 RULES = load_rule_paths(get_settings().split(get_settings().rule_paths)).rules
-RESULTS, ERRORS = run_all(RULES)
+RESULTS, ERRORS = run_all(RULES, TESTS_DIR, INVENTORIES)
 
 
 def test_rule_test_files_are_valid():
@@ -25,7 +28,7 @@ def _rule(rule_id):
 
 
 def test_harness_catches_wrong_expectation():
-    t, _ = load_test_files()[0]["DET-WIN-001"]
+    t, _ = load_test_files(TESTS_DIR)[0]["DET-WIN-001"]
     swapped = RuleTestFile(rule_id=t.rule_id, match=t.no_match, no_match=t.match)
     assert not run_rule_test(_rule("DET-WIN-001"), swapped).ok
 

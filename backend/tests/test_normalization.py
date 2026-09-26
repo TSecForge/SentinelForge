@@ -1,7 +1,7 @@
 import pytest
 
-from app.schemas.event import EventIn
-from app.services.normalization import NormalizationError, normalize
+from sentinelforge.schemas.event import EventIn
+from sentinelforge.normalize import NormalizationError, normalize
 
 
 def n(source, data):

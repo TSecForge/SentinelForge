@@ -8,9 +8,9 @@ import ipaddress
 import re
 from collections import defaultdict
 
-from app.core.logging import get_logger
-from app.schemas.environment import EnvironmentProfile, ExposedService, NetworkSummary, RiskContext, RuleParameters
-from app.schemas.inventory import Inventory
+from sentinelforge.log import get_logger
+from sentinelforge.schemas.profile import EnvironmentProfile, ExposedService, NetworkSummary, RiskContext, RuleParameters
+from sentinelforge.schemas.inventory import Inventory
 
 log = get_logger("profiling")
 

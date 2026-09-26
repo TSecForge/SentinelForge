@@ -1,11 +1,8 @@
-import hashlib
-import json
 from datetime import datetime, timezone
-from typing import Any
 
+from sentinelforge._util import get_path, stable_hash, utcnow
 
-def utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+__all__ = ["as_utc", "get_path", "iso", "stable_hash", "utcnow"]
 
 
 def as_utc(dt: datetime) -> datetime:
@@ -15,17 +12,3 @@ def as_utc(dt: datetime) -> datetime:
 
 def iso(dt: datetime | None) -> str | None:
     return as_utc(dt).isoformat().replace("+00:00", "Z") if dt else None
-
-
-def stable_hash(obj: Any) -> str:
-    return hashlib.sha256(json.dumps(obj, sort_keys=True, default=str).encode()).hexdigest()
-
-
-def get_path(data: dict, path: str) -> Any:
-    """Resolve 'process.parent_name' against nested dicts. Never touches attributes, only dict keys."""
-    cur: Any = data
-    for part in path.split("."):
-        if not isinstance(cur, dict) or part not in cur:
-            return None
-        cur = cur[part]
-    return cur

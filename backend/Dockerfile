@@ -3,12 +3,15 @@ FROM python:3.12-slim
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 WORKDIR /srv/sentinelforge
 
-COPY backend/requirements.txt backend/requirements.txt
-RUN pip install --no-cache-dir -r backend/requirements.txt
-
-# Rule packs, sample data and collector are read at runtime (RULE_PATHS, demo templates).
-COPY backend/app backend/app
+# 1) the sentinelforge library (with its built-in rule packs) + server dependencies
+COPY pyproject.toml README.md LICENSE NOTICE CHANGELOG.md ./
+COPY src src
 COPY detection-rules detection-rules
+COPY backend/requirements.txt backend/requirements.txt
+RUN cd backend && pip install --no-cache-dir -r requirements.txt
+
+# 2) server code and runtime data (custom rules, demo inventories, collector, plugins)
+COPY backend/app backend/app
 COPY custom-rules custom-rules
 COPY sample-data sample-data
 COPY collectors collectors

@@ -1,0 +1,12 @@
+rule_id: ACME-WIN-001
+match:
+  - name: RDP turned on
+    event: {event_type: process_creation, actor: {user: jdoe},
+            process: {name: reg.exe, command_line: 'reg add "HKLM\System\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f'}}
+no_match:
+  - name: RDP turned off
+    event: {event_type: process_creation,
+            process: {name: reg.exe, command_line: 'reg add "HKLM\System\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 1 /f'}}
+  - name: Only reading the value
+    event: {event_type: process_creation,
+            process: {name: reg.exe, command_line: 'reg query "HKLM\System\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections'}}

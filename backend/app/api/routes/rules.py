@@ -6,10 +6,10 @@ from sqlalchemy.orm import Session
 
 from app.db.session import get_db
 from app.models import Environment, Rule, RuleAssignment
-from app.schemas.rule import RuleValidateRequest
+from sentinelforge.schemas.rule import RuleValidateRequest
 from app.services import rules
 from app.services.detection.engine import engine
-from app.services.rules.loader import validate_rule_text
+from sentinelforge.rules.loader import validate_rule_text
 from app.utils import iso
 
 router = APIRouter(prefix="/rules", tags=["rules"])

@@ -1,0 +1,32 @@
+# Audit policy tuned for SentinelForge's Kubernetes rules (DET-K8S-001..004).
+apiVersion: audit.k8s.io/v1
+kind: Policy
+omitStages: ["RequestReceived"]
+rules:
+  # Never log secret or configmap contents - metadata (who / verb / name) is enough for detection.
+  - level: Metadata
+    resources:
+      - group: ""
+        resources: ["secrets", "configmaps"]
+  # exec / attach / port-forward into pods
+  - level: Metadata
+    resources:
+      - group: ""
+        resources: ["pods/exec", "pods/attach", "pods/portforward"]
+  # pod creation: the request body carries securityContext.privileged
+  - level: Request
+    verbs: ["create", "update", "patch"]
+    resources:
+      - group: ""
+        resources: ["pods"]
+  # RBAC changes: the request body carries roleRef
+  - level: Request
+    verbs: ["create", "update", "patch"]
+    resources:
+      - group: "rbac.authorization.k8s.io"
+        resources: ["clusterrolebindings", "rolebindings"]
+  # skip noisy read-only traffic from system components
+  - level: None
+    users: ["system:kube-proxy", "system:kube-scheduler", "system:kube-controller-manager"]
+    verbs: ["get", "list", "watch"]
+  - level: Metadata

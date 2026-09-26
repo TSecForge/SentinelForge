@@ -1,0 +1,45 @@
+# Vector (0.3x+) -> SentinelForge
+# Set SENTINELFORGE_API_KEY in Vector's environment.
+
+sources:
+  sshd_journal:
+    type: journald
+    include_units: [ssh, sshd]
+
+  k8s_audit_file:
+    type: file
+    include: [/var/log/kubernetes/audit/audit.log]
+
+transforms:
+  k8s_audit:
+    type: remap
+    inputs: [k8s_audit_file]
+    source: |
+      . = parse_json!(string!(.message))
+
+sinks:
+  sentinelforge_linux:
+    type: http
+    inputs: [sshd_journal]
+    uri: https://sentinelforge.example.internal/api/v1/ingest/linux
+    method: post
+    encoding:
+      codec: json
+    framing:
+      method: newline_delimited
+    request:
+      headers:
+        X-API-Key: "${SENTINELFORGE_API_KEY}"
+
+  sentinelforge_k8s_audit:
+    type: http
+    inputs: [k8s_audit]
+    uri: https://sentinelforge.example.internal/api/v1/ingest/kubernetes?host=prod-cluster
+    method: post
+    encoding:
+      codec: json
+    framing:
+      method: newline_delimited
+    request:
+      headers:
+        X-API-Key: "${SENTINELFORGE_API_KEY}"

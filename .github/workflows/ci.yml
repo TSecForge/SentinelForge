@@ -12,9 +12,6 @@ jobs:
   detections:
     name: Rules, detection tests & backend
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: backend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -22,15 +19,51 @@ jobs:
           python-version: "3.12"
           cache: pip
           cache-dependency-path: backend/requirements*.txt
-      - run: pip install -r requirements-dev.txt
+      - name: Install library (editable) + server
+        working-directory: backend
+        run: pip install -r requirements-dev.txt
       - name: Validate rule packs (schema, safe YAML, compile)
-        run: python -m app.cli rules validate
+        run: python -m sentinelforge rules validate builtin custom-rules
       - name: Per-rule unit tests (match / no-match cases)
-        run: python -m app.cli rules test
+        run: python -m sentinelforge rules test --rules builtin custom-rules --tests rule-tests --inventory-dir sample-data/environments
       - name: ATT&CK coverage report is up to date
-        run: python -m app.cli coverage export --check
-      - name: Backend test suite
+        run: python -m sentinelforge coverage export --rules builtin custom-rules --tests rule-tests --out docs --check
+      - name: Backend + library test suite
+        working-directory: backend
         run: python -m pytest -q
+
+  package:
+    name: Build & smoke-test the Python package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install build && python -m build
+      - name: Install the wheel in a clean venv (outside the repo) and use it
+        run: |
+          python -m venv /tmp/sf && /tmp/sf/bin/pip install dist/*.whl
+          cd /tmp
+          /tmp/sf/bin/sentinelforge --version
+          /tmp/sf/bin/sentinelforge rules validate
+          /tmp/sf/bin/sentinelforge evaluate --source windows "$GITHUB_WORKSPACE/sample-data/events/powershell.json" | tee /tmp/dets.ndjson
+          grep -q DET-WIN-001 /tmp/dets.ndjson
+      - uses: actions/upload-artifact@v4
+        with:
+          name: python-package
+          path: dist/
+
+  action:
+    name: GitHub Action on the example rule repo
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./
+        with:
+          rules: examples/rule-repo/rules
+          tests: examples/rule-repo/rule-tests
+          include-builtin: "true"
 
   frontend:
     name: Frontend type-check & build
@@ -58,7 +91,9 @@ jobs:
           python-version: "3.12"
           cache: pip
           cache-dependency-path: backend/requirements*.txt
-      - run: pip install -r backend/requirements-dev.txt
+      - name: Install
+        working-directory: backend
+        run: pip install -r requirements-dev.txt
       - name: Run discovery.ps1 on the runner and validate its inventory
         working-directory: backend
         env:

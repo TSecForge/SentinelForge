@@ -15,15 +15,13 @@ from app.core.config import get_settings
 from app.core.logging import get_logger
 from app.models import Environment, EnvironmentProfile as ProfileRow, Rule, RuleAssignment
 from app.schemas.environment import EnvironmentProfile
-from app.schemas.rule import RuleDefinition
-from app.services.rules.evaluator import RuleCompileError, compile_rule
-from app.services.rules.loader import LoadReport, load_rule_paths, resolve_template
+from sentinelforge.schemas.rule import RuleDefinition
+from sentinelforge.rules.evaluator import RuleCompileError, compile_rule
+from sentinelforge.rules.loader import LoadReport, load_rule_paths, resolve_template
+from sentinelforge.rules.selection import applicability  # noqa: F401  (re-exported)
 from app.utils import stable_hash
 
 log = get_logger("rules")
-
-# Rules on these platforms only make sense when the technology exists.
-IMPLIED_TECH = {"docker": "Docker", "kubernetes": "Kubernetes"}
 
 last_load_errors: dict[str, list[str]] = {}
 
@@ -72,33 +70,6 @@ def sync_rule_store(db: Session) -> dict:
 
 def current_templates(db: Session) -> list[Rule]:
     return list(db.scalars(select(Rule).where(Rule.status == "validated").order_by(Rule.rule_id)))
-
-
-def applicability(defn: RuleDefinition, profile: EnvironmentProfile) -> tuple[bool, str]:
-    reasons = []
-    if defn.platform in ("windows", "linux"):
-        if profile.platform != defn.platform:
-            return False, f"rule targets {defn.platform}; host platform is {profile.platform}"
-        reasons.append(f"host platform is {defn.platform}")
-    aw = defn.applies_when
-    techs = list(aw.technologies)
-    if defn.platform in IMPLIED_TECH and IMPLIED_TECH[defn.platform] not in techs:
-        techs.append(IMPLIED_TECH[defn.platform])
-    if aw.platforms and profile.platform not in aw.platforms:
-        return False, f"requires platform in {aw.platforms}"
-    if techs:
-        hit = [t for t in techs if t in profile.technologies]
-        if not hit:
-            return False, f"requires {' or '.join(techs)}; not discovered on this host"
-        for t in hit:
-            why = "; ".join(profile.evidence.get(t, [])[:2])
-            reasons.append(f"{t} discovered ({why})" if why else f"{t} discovered")
-    if aw.environment_types:
-        hit = [t for t in aw.environment_types if t in profile.environment_type]
-        if not hit:
-            return False, f"requires environment type {' or '.join(aw.environment_types)}"
-        reasons.append(f"environment type {', '.join(hit)}")
-    return True, "; ".join(reasons) or "applies to all environments"
 
 
 def generate_rules(db: Session, env: Environment) -> dict:

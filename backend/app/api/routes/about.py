@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from app import __creator__, __license__, __project__, __version__
 from app.core.config import get_settings
-from app.plugins import registry
+from sentinelforge.registry import registry
 
 router = APIRouter(tags=["about"])
 

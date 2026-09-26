@@ -4,8 +4,8 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.models import Environment, EnvironmentProfile as ProfileRow, RuleAssignment
-from app.schemas.inventory import Inventory
-from app.services.profiling import build_profile
+from sentinelforge.schemas.inventory import Inventory
+from sentinelforge.profiling import build_profile
 from app.utils import iso
 
 

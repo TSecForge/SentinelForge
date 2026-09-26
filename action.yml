@@ -1,0 +1,75 @@
+name: SentinelForge detection-as-code
+description: Validate detection rules, run their match / no-match unit tests and publish an ATT&CK coverage summary
+author: Sujhal Gurav
+branding:
+  icon: shield
+  color: orange
+
+inputs:
+  rules:
+    description: Space-separated rule files/directories to validate and test
+    default: rules
+  tests:
+    description: Directory with rule test files (rule_id / match / no_match)
+    default: rule-tests
+  include-builtin:
+    description: Also load SentinelForge's built-in rules (catches ID collisions; adds them to the coverage report)
+    default: "false"
+  inventory-dir:
+    description: Directory with inventory JSON files referenced by `environment:` in tests
+    default: ""
+  allow-untested:
+    description: Don't fail for rules that have no test file
+    default: "false"
+  coverage-summary:
+    description: Write the ATT&CK coverage report to the job summary
+    default: "true"
+  python-version:
+    description: Python used to run SentinelForge
+    default: "3.12"
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Install SentinelForge (from this action's revision)
+      shell: bash
+      run: python -m pip install --quiet "${{ github.action_path }}"
+
+    - name: Validate rules
+      shell: bash
+      env:
+        RULES: ${{ inputs.rules }}
+        BUILTIN: ${{ inputs.include-builtin }}
+      run: |
+        paths=($RULES)
+        [ "$BUILTIN" = "true" ] && paths=(builtin "${paths[@]}")
+        python -m sentinelforge rules validate "${paths[@]}"
+
+    - name: Run rule unit tests
+      shell: bash
+      env:
+        RULES: ${{ inputs.rules }}
+        TESTS: ${{ inputs.tests }}
+        INVENTORY_DIR: ${{ inputs.inventory-dir }}
+        ALLOW_UNTESTED: ${{ inputs.allow-untested }}
+      run: |
+        args=(--rules $RULES --tests "$TESTS")
+        [ -n "$INVENTORY_DIR" ] && args+=(--inventory-dir "$INVENTORY_DIR")
+        [ "$ALLOW_UNTESTED" = "true" ] && args+=(--allow-untested)
+        python -m sentinelforge rules test "${args[@]}"
+
+    - name: ATT&CK coverage summary
+      if: ${{ inputs.coverage-summary == 'true' }}
+      shell: bash
+      env:
+        RULES: ${{ inputs.rules }}
+        TESTS: ${{ inputs.tests }}
+        BUILTIN: ${{ inputs.include-builtin }}
+      run: |
+        paths=($RULES)
+        [ "$BUILTIN" = "true" ] && paths=(builtin "${paths[@]}")
+        python -m sentinelforge coverage export --rules "${paths[@]}" --tests "$TESTS" --summary >> "$GITHUB_STEP_SUMMARY"

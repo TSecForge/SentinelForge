@@ -1,14 +1,13 @@
-"""SentinelForge CLI. The web UI is the primary interface; this is for scripting and CI.
+"""sentinelforge-server CLI: operations that need the server's database or collectors.
 
-    sentinelforge discovery [--local | --remote HOST | --file inventory.json] [--save]
-    sentinelforge profile --file inventory.json | --template windows-web-server
-    sentinelforge rules validate [PATH ...]
-    sentinelforge rules test
-    sentinelforge coverage export [--check]
-    sentinelforge rules generate --file inventory.json | --template NAME
-    sentinelforge events simulate --template NAME [--scenario NAME ...] [--benign N]
-    sentinelforge demo [--template NAME] [--benign N]
-    sentinelforge schemas export [--out DIR]
+Rule validation, rule tests, ATT&CK coverage and offline evaluation live in the library CLI (`sentinelforge`).
+
+    sentinelforge-server discovery [--local | --remote HOST | --file inventory.json] [--save]
+    sentinelforge-server profile --file inventory.json | --template windows-web-server
+    sentinelforge-server rules generate --file inventory.json | --template NAME
+    sentinelforge-server events simulate --template NAME [--scenario NAME ...] [--benign N]
+    sentinelforge-server demo [--template NAME] [--benign N]
+    sentinelforge-server schemas export [--out DIR]
 """
 
 import argparse
@@ -22,7 +21,7 @@ from app.core.config import REPO_ROOT, get_settings
 def _db():
     from app.db.session import SessionLocal, init_db
     from app.plugins import load_plugins
-    from app.services import normalization  # noqa: F401
+    import sentinelforge.normalize  # noqa: F401  (registers built-in parsers)
     from app.services.rules import sync_rule_store
     from app.services.siem import gateway  # noqa: F401
 
@@ -64,66 +63,9 @@ def cmd_discovery(args):
 
 
 def cmd_profile(args):
-    from app.services.profiling import build_profile
+    from sentinelforge.profiling import build_profile
 
     print(build_profile(_inventory(args)).model_dump_json(indent=2))
-
-
-def cmd_rules_validate(args):
-    from app.services.rules.loader import load_rule_paths
-
-    paths = args.paths or get_settings().split(get_settings().rule_paths)
-    report = load_rule_paths(paths)
-    for r in report.rules:
-        print(f"  OK    {r.definition.id:16} v{r.definition.version:6} {r.definition.name}")
-    for path, errs in report.errors.items():
-        print(f"  FAIL  {path}")
-        for e in errs:
-            print(f"          {e}")
-    print(f"{len(report.rules)} valid, {len(report.errors)} invalid")
-    return 1 if report.errors else 0
-
-
-def _all_rules():
-    from app.services.rules.loader import load_rule_paths
-
-    return load_rule_paths(get_settings().split(get_settings().rule_paths)).rules
-
-
-def cmd_rules_test(args):
-    from app.services.rules.testing import run_all
-
-    results, errors = run_all(_all_rules())
-    cases = 0
-    for r in results:
-        cases += r.cases
-        print(f"  {'PASS' if r.ok else 'FAIL'}  {r.rule_id:16} {r.cases} case(s)")
-        for f in r.failures:
-            print(f"          {f}")
-    for path, errs in errors.items():
-        print(f"  ERROR {path}: {'; '.join(errs)}")
-    failed = [r for r in results if not r.ok]
-    print(f"{len(results) - len(failed)}/{len(results)} rules passed, {cases} test cases, {len(errors)} test-file error(s)")
-    return 1 if failed or errors else 0
-
-
-def cmd_coverage_export(args):
-    from app.services.rules.coverage import coverage_markdown, navigator_layer
-    from app.services.rules.testing import load_test_files
-
-    rules = _all_rules()
-    tested = set(load_test_files()[0])
-    out = Path(args.out)
-    files = {out / "attack-coverage.md": coverage_markdown(rules, tested), out / "attack-navigator-layer.json": navigator_layer(rules)}
-    stale = [p for p, text in files.items() if not p.exists() or p.read_text(encoding="utf-8") != text]
-    if args.check:
-        for p in stale:
-            print(f"stale: {p} (run `sentinelforge coverage export`)")
-        return 1 if stale else 0
-    for p, text in files.items():
-        p.write_text(text, encoding="utf-8", newline="\n")
-        print(f"wrote {p}")
-    return 0
 
 
 def cmd_rules_generate(args):
@@ -160,11 +102,11 @@ def cmd_demo(args):
 
 
 def cmd_schemas_export(args):
-    from app.schemas.detection import DetectionEvent
-    from app.schemas.environment import EnvironmentProfile
-    from app.schemas.event import NormalizedEvent
-    from app.schemas.inventory import Inventory
-    from app.schemas.rule import RuleDefinition
+    from sentinelforge.schemas.detection import DetectionEvent
+    from sentinelforge.schemas.profile import EnvironmentProfile
+    from sentinelforge.schemas.event import NormalizedEvent
+    from sentinelforge.schemas.inventory import Inventory
+    from sentinelforge.schemas.rule import RuleDefinition
 
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -177,7 +119,7 @@ def cmd_schemas_export(args):
 
 
 def main(argv: list[str] | None = None) -> int:
-    p = argparse.ArgumentParser(prog="sentinelforge", description="SentinelForge - environment-aware detection engineering")
+    p = argparse.ArgumentParser(prog="sentinelforge-server", description="SentinelForge server operations")
     sub = p.add_subparsers(dest="cmd", required=True)
 
     def src(sp, live=False):
@@ -199,11 +141,6 @@ def main(argv: list[str] | None = None) -> int:
     pr.set_defaults(fn=cmd_profile)
 
     r = sub.add_parser("rules", help="rule operations").add_subparsers(dest="rcmd", required=True)
-    rv = r.add_parser("validate", help="validate rule packs")
-    rv.add_argument("paths", nargs="*")
-    rv.set_defaults(fn=cmd_rules_validate)
-    rt = r.add_parser("test", help="run per-rule unit tests from rule-tests/")
-    rt.set_defaults(fn=cmd_rules_test)
     rg = r.add_parser("generate", help="select/generate rules for an inventory")
     src(rg)
     rg.set_defaults(fn=cmd_rules_generate)
@@ -224,12 +161,6 @@ def main(argv: list[str] | None = None) -> int:
     se = sc.add_parser("export")
     se.add_argument("--out", default=str(REPO_ROOT / "schemas"))
     se.set_defaults(fn=cmd_schemas_export)
-
-    cv = sub.add_parser("coverage", help="MITRE ATT&CK coverage").add_subparsers(dest="ccmd", required=True)
-    ce = cv.add_parser("export", help="write docs/attack-coverage.md and docs/attack-navigator-layer.json")
-    ce.add_argument("--out", default=str(REPO_ROOT / "docs"))
-    ce.add_argument("--check", action="store_true", help="exit 1 if the committed files are stale (CI)")
-    ce.set_defaults(fn=cmd_coverage_export)
 
     args = p.parse_args(argv)
     from app.core.logging import setup_logging

@@ -1,0 +1,24 @@
+id: ACME-WIN-001
+name: Remote Desktop Enabled via reg.exe
+description: >
+  reg.exe set fDenyTSConnections to 0, turning on Remote Desktop. Acme policy is to enable RDP only
+  through Group Policy, so an interactive change is worth a look.
+version: "1.0"
+author: Acme Security Team
+source: organization
+platform: windows
+event_type: process_creation
+severity: medium
+fidelity: medium
+category: remote_access
+selection:
+  process.name: reg.exe
+condition:
+  all:
+    - process.command_line|contains: fdenytsconnections
+    - process.command_line|re: '/d\s+0\b'
+summary: "RDP enabled on {host} by {actor.user}"
+mitre: {tactic: lateral-movement, technique: T1021.001}
+tags: [acme, rdp]
+false_positives:
+  - Helpdesk enabling RDP during approved troubleshooting

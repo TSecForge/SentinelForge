@@ -14,7 +14,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 
-from app.schemas.event import EventIn
+from sentinelforge.schemas.event import EventIn
 
 SYSMON = "Microsoft-Windows-Sysmon/Operational"
 

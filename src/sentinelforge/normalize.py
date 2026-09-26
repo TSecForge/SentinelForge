@@ -9,10 +9,10 @@ import re
 from datetime import datetime, timezone
 from typing import Any
 
-from app.plugins import registry
-from app.schemas.event import EventIn, NormalizedEvent
-from app.services.profiling import normalize_image
-from app.utils import stable_hash
+from sentinelforge.registry import registry
+from sentinelforge.schemas.event import EventIn, NormalizedEvent
+from sentinelforge.profiling import normalize_image
+from sentinelforge._util import stable_hash
 
 
 class NormalizationError(ValueError):
@@ -64,7 +64,21 @@ def _user(domain: Any, name: Any) -> tuple[str | None, str | None]:
 _TASK_CMD = re.compile(r"<Command>(.*?)</Command>(?:\s*<Arguments>(.*?)</Arguments>)?", re.S | re.I)
 
 
+def _from_winlogbeat(d: dict) -> dict:
+    """Winlogbeat / Elastic Agent (ECS) event -> the Windows record shape parse_windows expects."""
+    w = d["winlog"]
+    host = d.get("host")
+    host_name = host.get("name") if isinstance(host, dict) else host
+    return {"EventID": w.get("event_id"), "Channel": w.get("channel"), "Provider": w.get("provider_name"),
+            "Computer": w.get("computer_name") or host_name,
+            "TimeCreated": d.get("@timestamp"), "EventRecordID": w.get("record_id"),
+            "EventData": w.get("event_data") or {}, "UserData": w.get("user_data") or {}, "Message": d.get("message"),
+            "event_id": d.get("event_id")}
+
+
 def parse_windows(d: dict) -> dict:
+    if isinstance(d.get("winlog"), dict):
+        d = _from_winlogbeat(d)
     ed = d.get("EventData") or {}
     eid = _int(d.get("EventID"))
     channel = str(d.get("Channel", "")).lower()
@@ -171,8 +185,13 @@ _SSH_OK = re.compile(r"Accepted (\S+) for (\S+) from (\S+) port (\d+)")
 
 
 def parse_linux(d: dict) -> dict:
-    out: dict[str, Any] = {"host": d.get("hostname") or d.get("host"), "timestamp": _ts(d.get("timestamp")),
-                           "raw_reference": _clean(d.get("raw_reference"))}
+    """Own JSON shape, plus what common shippers emit: Fluent Bit syslog/tail (host, ident, time/date, log),
+    Vector syslog (hostname, appname, timestamp) and journald (_HOSTNAME, MESSAGE, SYSLOG_IDENTIFIER)."""
+    host = d.get("hostname") or d.get("host") or d.get("_HOSTNAME")
+    if isinstance(host, dict):  # ECS-style {"host": {"name": ...}}
+        host = host.get("name") or host.get("hostname")
+    ts = next((d[k] for k in ("timestamp", "@timestamp", "time", "date") if d.get(k) not in (None, "")), None)
+    out: dict[str, Any] = {"host": host, "timestamp": _ts(ts), "raw_reference": _clean(d.get("raw_reference"))}
     kind = d.get("type")
     if kind == "process":
         out["event_type"] = "process_creation"
@@ -181,7 +200,7 @@ def parse_linux(d: dict) -> dict:
                           "command_line": _clean(d.get("cmdline")), "parent_name": basename(d.get("parent_exe") or d.get("parent_comm")),
                           "parent_pid": _int(d.get("ppid"))}
         return out
-    msg = str(d.get("message", ""))
+    msg = str(next((d[k] for k in ("message", "MESSAGE", "log") if d.get(k)), ""))
     if m := _SSH_FAIL.search(msg):
         out.update(event_type="authentication", actor={"user": m.group(1).lower()},
                    auth={"outcome": "failure", "method": "ssh"},

@@ -22,15 +22,15 @@ from pathlib import Path
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
-from app.core.config import REPO_ROOT
-from app.schemas.event import NormalizedEvent
-from app.services.detection.engine import DetectionEngine
-from app.services.discovery import load_demo_inventory
-from app.services.profiling import build_profile
-from app.services.rules.evaluator import compile_rule
-from app.services.rules.loader import LoadedRule, _safe_yaml, resolve_template
+from sentinelforge.inventory import load_inventory
+from sentinelforge.profiling import build_profile
+from sentinelforge.rules.evaluator import compile_rule
+from sentinelforge.rules.loader import LoadedRule, _safe_yaml, resolve_template
+from sentinelforge.schemas.event import NormalizedEvent
 
-RULE_TESTS_DIR = REPO_ROOT / "rule-tests"
+RULE_TESTS_DIR = Path("rule-tests")
+# Where `environment: <name>` is looked up (after the test file's own folder).
+DEFAULT_INVENTORY_DIRS = [Path("inventories"), Path("sample-data") / "environments"]
 
 
 class Case(BaseModel):
@@ -44,7 +44,7 @@ class Case(BaseModel):
 class RuleTestFile(BaseModel):
     model_config = ConfigDict(extra="forbid")
     rule_id: str
-    environment: str | None = None
+    environment: str | None = None  # inventory JSON path (relative to this file) or a name in the inventory dirs
     match: list[Case] = Field(min_length=1)
     no_match: list[Case] = Field(min_length=1)
 
@@ -76,18 +76,30 @@ def load_test_files(directory: Path = RULE_TESTS_DIR) -> tuple[dict[str, tuple[R
     return tests, errors
 
 
-_profiles: dict[str, dict] = {}
+_profiles: dict[Path, dict] = {}
 
 
-def _params(template: str | None) -> dict:
-    if not template:
+def _find_inventory(env: str, test_path: str | None, inventory_dirs: list[Path]) -> Path:
+    here = Path(test_path).parent if test_path else Path(".")
+    candidates = [here / env, *[d / f"{env}.json" for d in [here, *inventory_dirs]], *[d / env for d in inventory_dirs]]
+    for c in candidates:
+        if c.is_file():
+            return c.resolve()
+    raise FileNotFoundError(f"inventory {env!r} not found (looked in {here} and {[str(d) for d in inventory_dirs]})")
+
+
+def _params(env: str | None, test_path: str | None, inventory_dirs: list[Path]) -> dict:
+    if not env:
         return {"listening_ports": [], "approved_images": [], "container_ports": [], "internal_cidrs": [], "known_admins": []}
-    if template not in _profiles:
-        _profiles[template] = build_profile(load_demo_inventory(template)).parameters.model_dump()
-    return _profiles[template]
+    path = _find_inventory(env, test_path, inventory_dirs)
+    if path not in _profiles:
+        _profiles[path] = build_profile(load_inventory(path)).parameters.model_dump()
+    return _profiles[path]
 
 
 def _fires(rule, case: Case, idx: int) -> bool:
+    from sentinelforge.engine import DetectionEngine
+
     engine = DetectionEngine()  # fresh threshold state per case
     t0 = datetime(2026, 1, 1, tzinfo=timezone.utc)
     hit = False
@@ -99,10 +111,12 @@ def _fires(rule, case: Case, idx: int) -> bool:
     return hit
 
 
-def run_rule_test(loaded: LoadedRule, test: RuleTestFile, path: str | None = None) -> RuleTestResult:
+def run_rule_test(loaded: LoadedRule, test: RuleTestFile, path: str | None = None,
+                  inventory_dirs: list[Path] | None = None) -> RuleTestResult:
     res = RuleTestResult(loaded.definition.id, path)
     try:
-        rule = compile_rule(resolve_template(loaded.definition, _params(test.environment)))
+        params = _params(test.environment, path, inventory_dirs or DEFAULT_INVENTORY_DIRS)
+        rule = compile_rule(resolve_template(loaded.definition, params))
     except Exception as e:  # noqa: BLE001 - report, don't crash the suite
         res.failures.append(f"could not build rule: {e}")
         return res
@@ -119,15 +133,17 @@ def run_rule_test(loaded: LoadedRule, test: RuleTestFile, path: str | None = Non
     return res
 
 
-def run_all(rules: list[LoadedRule], directory: Path = RULE_TESTS_DIR) -> tuple[list[RuleTestResult], dict[str, list[str]]]:
-    tests, errors = load_test_files(directory)
+def run_all(rules: list[LoadedRule], directory: Path = RULE_TESTS_DIR, inventory_dirs: list[Path] | None = None,
+            require_tests: bool = True) -> tuple[list[RuleTestResult], dict[str, list[str]]]:
+    tests, errors = load_test_files(Path(directory))
     results = []
     for lr in rules:
         if lr.definition.id not in tests:
-            results.append(RuleTestResult(lr.definition.id, None, ["no tests (add a file in rule-tests/)"]))
+            if require_tests:
+                results.append(RuleTestResult(lr.definition.id, None, [f"no tests (add a file in {directory})"]))
             continue
         t, p = tests[lr.definition.id]
-        results.append(run_rule_test(lr, t, p))
+        results.append(run_rule_test(lr, t, p, inventory_dirs))
     known = {lr.definition.id for lr in rules}
     for rid, (_, p) in tests.items():
         if rid not in known:

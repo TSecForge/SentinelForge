@@ -13,24 +13,15 @@ Collectors are external by design - anything that emits inventory schema 1.0 can
 
 import importlib
 import sys
-from collections.abc import Callable
-from dataclasses import dataclass, field
+
+from sentinelforge.registry import registry
 
 from app.core.config import get_settings
 from app.core.logging import get_logger
 
+__all__ = ["registry", "load_plugins"]
+
 log = get_logger("plugins")
-
-
-@dataclass
-class Registry:
-    event_parsers: dict[str, Callable[[dict], dict]] = field(default_factory=dict)
-    siem_adapters: dict[str, Callable] = field(default_factory=dict)
-    ioc_extractors: list[Callable[[dict], list[tuple[str, str, str]]]] = field(default_factory=list)
-    loaded_plugins: list[str] = field(default_factory=list)
-
-
-registry = Registry()
 
 
 def load_plugins() -> None:

@@ -6,8 +6,8 @@ import ipaddress
 import re
 from typing import Any
 
-from app.plugins import registry
-from app.utils import get_path
+from sentinelforge.registry import registry
+from sentinelforge._util import get_path
 
 _URL = re.compile(r"\b(?:https?|ftp)://[^\s'\"<>()\[\]{}|\\^`]+", re.I)
 _DOMAIN = re.compile(r"(?<![\w.\-@])(?:[a-z0-9](?:[a-z0-9\-]{0,61}[a-z0-9])?\.)+[a-z]{2,24}(?![\w\-])", re.I)

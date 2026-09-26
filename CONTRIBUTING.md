@@ -21,10 +21,10 @@ Run both with `uvicorn app.main:app --reload` (from `backend/`) and `npm run dev
 4. Declare **applicability** with `applies_when` (technologies / environment types / platforms). Rules that only
    make sense when something exists must say so. That is the core idea of the project.
 5. Use `$profile.<param>` for environment-specific values rather than hard-coding them.
-6. Validate with `python -m app.cli rules validate`.
+6. Validate with `python -m sentinelforge rules validate builtin custom-rules` (from the repo root).
 7. Add `rule-tests/<ID>.yml` with at least one **match** and one **no_match** event, including the near-miss
-   that a careless rule would catch. Run `python -m app.cli rules test`. CI fails for rules without tests.
-   Then run `python -m app.cli coverage export` and commit the regenerated `docs/attack-coverage.md`.
+   that a careless rule would catch. Run `python -m sentinelforge rules test --rules builtin custom-rules --inventory-dir sample-data/environments`. CI fails for rules without tests.
+   Then run `python -m sentinelforge coverage export --rules builtin custom-rules` and commit the regenerated `docs/attack-coverage.md`.
    If you add a demo scenario, add it in `app/services/simulation` and list its expected rules.
 8. When you change an existing rule, **bump `version`**. The store refuses changed content under an old version.
 

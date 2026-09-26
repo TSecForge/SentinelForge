@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from app.core.config import get_settings
 from app.core.logging import get_logger
 from app.models import DeliveryAttempt, Detection
-from app.plugins import registry
+from sentinelforge.registry import registry
 from app.services import metrics
 from app.services.siem import adapters as _builtin  # noqa: F401  (registers built-in adapters)
 from app.utils import iso, utcnow

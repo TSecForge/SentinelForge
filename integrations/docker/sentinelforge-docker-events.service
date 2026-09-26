@@ -1,0 +1,18 @@
+[Unit]
+Description=Forward Docker Engine events to SentinelForge
+After=docker.service network-online.target
+Requires=docker.service
+
+[Service]
+Environment=SENTINELFORGE_URL=https://sentinelforge.example.internal
+# Put the key in an override (systemctl edit) or an EnvironmentFile, not here.
+EnvironmentFile=-/etc/sentinelforge/forwarder.env
+# $$ passes a literal $ through systemd's own variable expansion to the shell.
+ExecStart=/bin/sh -c 'docker events --filter type=container --format "{{json .}}" | sentinelforge forward --url "$${SENTINELFORGE_URL}" --source docker --host "$$(hostname)"'
+Restart=always
+RestartSec=5
+DynamicUser=yes
+SupplementaryGroups=docker
+
+[Install]
+WantedBy=multi-user.target

@@ -25,7 +25,7 @@ services:
     environment:
       DATABASE_URL: postgresql+psycopg://sentinelforge:${POSTGRES_PASSWORD:-sentinelforge-dev}@db:5432/sentinelforge
       CORS_ORIGINS: http://localhost:8080
-      RULE_PATHS: /srv/sentinelforge/detection-rules,/srv/sentinelforge/custom-rules
+      RULE_PATHS: builtin,/srv/sentinelforge/custom-rules
     depends_on:
       db:
         condition: service_healthy

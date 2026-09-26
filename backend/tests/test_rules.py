@@ -3,8 +3,8 @@ import textwrap
 import pytest
 
 from app.core.config import REPO_ROOT
-from app.services.rules.evaluator import RuleCompileError, compile_node, render_summary
-from app.services.rules.loader import load_rule_paths, validate_rule_text
+from sentinelforge.rules.evaluator import RuleCompileError, compile_node, render_summary
+from sentinelforge.rules.loader import load_rule_paths, validate_rule_text
 
 GOOD = textwrap.dedent("""
     id: TEST-001

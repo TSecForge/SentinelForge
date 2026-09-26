@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.db.session import get_db
 from app.models import Environment, RuleAssignment
-from app.schemas.rule import AssignmentStatusUpdate
+from sentinelforge.schemas.rule import AssignmentStatusUpdate
 from app.services import environments, rules
 from app.services.detection.engine import engine
 

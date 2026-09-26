@@ -1,5 +1,28 @@
 # Architecture
 
+## Library and server
+
+SentinelForge ships as two layers:
+
+```
+ ┌─────────────────────────────── sentinelforge (library, pip: sentinelforge-detect) ───────────────────────────────┐
+ │ schemas · inventory parsing · profiling · rules (loader, safe evaluator, selection, testing, coverage)            │
+ │ normalization (windows/linux/docker/kubernetes/generic + plugins) · enrichment · observables · DetectionEngine    │
+ │ Engine (embeddable pipeline) · CLI: rules validate/test, coverage, profile, evaluate, forward · built-in rules    │
+ │ dependencies: pydantic, PyYAML                                                                                    │
+ └───────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+          ▲ used by                      ▲ used by                                 ▲ used by
+ ┌────────┴─────────────┐   ┌────────────┴─────────────┐   ┌──────────────────────────┴───────────────────────────┐
+ │ your code / pipeline │   │ GitHub Action (action.yml)│   │ sentinelforge server (backend/, FastAPI + SQLAlchemy)  │
+ │ Engine.process(...)  │   │ your rule repo in CI      │   │ discovery, DB, rule assignments, ingest API, SIEM      │
+ └──────────────────────┘   └──────────────────────────┘   │ gateway, metrics, dashboard API, demo                  │
+                                                          └────────────────────────────────────────────────────────┘
+```
+
+The library never imports the server, and `backend/tests/test_library.py` checks that importing it loads no web
+framework or database modules. Everything that needs persistence stays in the server: rule assignment history,
+events and detections, SIEM delivery, and live discovery.
+
 SentinelForge is an environment-aware detection layer that sits in front of, or next to, a SIEM.
 The design keeps five concerns separate, and each one lives in its own service package under
 `backend/app/services/`. API routes contain no business logic.
@@ -92,7 +115,7 @@ workload this instance actually processed.
 
 ## Extension points
 
-`backend/app/plugins.py` holds one registry: `event_parsers`, `siem_adapters`, and `ioc_extractors`. The built-ins
+`sentinelforge.registry` (`src/sentinelforge/registry.py`) holds one registry: `event_parsers`, `siem_adapters`, and `ioc_extractors`. The built-ins
 register themselves there exactly the way plugins do. Rule packs are directories listed in `RULE_PATHS`. Collectors
 are external producers of inventory schema 1.0. See [extending.md](extending.md).
 

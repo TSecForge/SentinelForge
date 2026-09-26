@@ -4,9 +4,9 @@ import ipaddress
 import uuid
 from typing import Any
 
-from app.services.enrichment.ioc import extract_observables
-from app.services.rules.evaluator import CompiledRule, render_summary
-from app.utils import get_path
+from sentinelforge.ioc import extract_observables
+from sentinelforge.rules.evaluator import CompiledRule, render_summary
+from sentinelforge._util import get_path
 
 # Deterministic, documented confidence: it is the rule author's fidelity rating, nothing learned.
 FIDELITY_CONFIDENCE = {"high": 0.9, "medium": 0.7, "low": 0.5}

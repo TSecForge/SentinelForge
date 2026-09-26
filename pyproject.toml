@@ -1,0 +1,51 @@
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[project]
+name = "sentinelforge-detect"
+dynamic = ["version"]
+description = "Environment-aware detection engineering: safe Sigma-style rule engine, event normalization, ATT&CK-mapped rules and detection-as-code tooling"
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+authors = [{ name = "Sujhal Gurav" }]
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic>=2.7,<3",
+    "PyYAML>=6.0.1",
+]
+keywords = ["detection-engineering", "siem", "sigma", "mitre-attack", "blue-team", "soc", "threat-detection", "detection-as-code"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: System Administrators",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Security",
+    "Topic :: System :: Monitoring",
+]
+
+[project.urls]
+Homepage = "https://github.com/TSecForge/SentinelForge"
+Documentation = "https://github.com/TSecForge/SentinelForge/tree/main/docs"
+Issues = "https://github.com/TSecForge/SentinelForge/issues"
+Changelog = "https://github.com/TSecForge/SentinelForge/blob/main/CHANGELOG.md"
+
+[project.scripts]
+sentinelforge = "sentinelforge.cli:main"
+
+[tool.hatch.version]
+path = "src/sentinelforge/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/sentinelforge"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"detection-rules" = "sentinelforge/rulepacks/builtin"
+
+[tool.hatch.build.targets.sdist]
+include = ["src/sentinelforge", "detection-rules", "README.md", "LICENSE", "NOTICE", "CHANGELOG.md"]

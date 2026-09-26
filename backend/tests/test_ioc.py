@@ -1,4 +1,4 @@
-from app.services.enrichment.ioc import extract_from_text, extract_observables
+from sentinelforge.ioc import extract_from_text, extract_observables
 from app.services.simulation import CRADLE
 
 

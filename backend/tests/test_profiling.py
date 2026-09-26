@@ -2,7 +2,7 @@ import json
 
 from app.services import discovery, environments, rules
 from app.services.discovery import parse_inventory
-from app.services.profiling import build_profile, normalize_image
+from sentinelforge.profiling import build_profile, normalize_image
 
 
 def _profile(name):

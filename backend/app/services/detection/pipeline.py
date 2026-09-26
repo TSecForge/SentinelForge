@@ -6,12 +6,12 @@ from sqlalchemy.orm import Session
 from app.core.config import get_settings
 from app.core.logging import get_logger
 from app.models import Detection, Environment, Event, Observable, RuleAssignment
-from app.schemas.event import EventIn, IngestResult
-from app.schemas.rule import SEVERITY_ORDER
+from sentinelforge.schemas.event import EventIn, IngestResult
+from sentinelforge.schemas.rule import SEVERITY_ORDER
 from app.services import metrics
 from app.services.detection.engine import engine
-from app.services.enrichment import build_detection
-from app.services.normalization import NormalizationError, normalize
+from sentinelforge.enrich import build_detection
+from sentinelforge.normalize import NormalizationError, normalize
 from app.services.siem import gateway
 from app.utils import utcnow
 

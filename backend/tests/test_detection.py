@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta, timezone
 
-from app.schemas.event import EventIn
+from sentinelforge.schemas.event import EventIn
 from app.services import discovery, environments, rules
 from app.services.detection.engine import engine
 from app.services.detection.pipeline import ingest
-from app.services.rules.evaluator import compile_node
+from sentinelforge.rules.evaluator import compile_node
 from app.services.simulation import CRADLE, ENCODED, SCENARIOS, benign_events, proc, scenario_events, win
 
 PS = "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe"

@@ -5,7 +5,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
-from app.schemas.rule import Severity
+from sentinelforge.schemas.rule import Severity
 
 ObservableType = Literal[
     "ipv4", "ipv6", "domain", "url", "file_path", "hash_md5", "hash_sha1", "hash_sha256",

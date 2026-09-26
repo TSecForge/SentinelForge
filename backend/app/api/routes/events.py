@@ -1,6 +1,8 @@
+import json
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request
+from starlette.concurrency import run_in_threadpool
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
@@ -8,10 +10,50 @@ from app.api.serializers import event_out
 from app.core.config import get_settings
 from app.db.session import get_db
 from app.models import Event
-from app.schemas.event import EventBatchIn, EventIn
+from sentinelforge.schemas.event import EventBatchIn, EventIn
 from app.services.detection.pipeline import ingest
 
 router = APIRouter(prefix="/events", tags=["events"])
+ingest_router = APIRouter(tags=["events"])
+
+SOURCE_RE = r"^[a-z][a-z0-9_]{1,31}$"
+HOST_RE = r"^[A-Za-z0-9][A-Za-z0-9.\-_]{0,254}$"
+
+
+def _parse_body(body: bytes) -> list:
+    text = body.decode("utf-8-sig", errors="replace").strip()
+    if not text:
+        return []
+    try:
+        doc = json.loads(text)
+    except json.JSONDecodeError:  # NDJSON (Vector, Fluent Bit json_lines, `docker events --format '{{json .}}'`)
+        try:
+            return [json.loads(line) for line in text.splitlines() if line.strip()]
+        except json.JSONDecodeError as e:
+            raise HTTPException(400, f"body is neither JSON nor NDJSON: {e}") from e
+    if isinstance(doc, dict) and isinstance(doc.get("events"), list):
+        return doc["events"]
+    if isinstance(doc, dict) and doc.get("kind") == "EventList" and isinstance(doc.get("items"), list):
+        return doc["items"]  # kube-apiserver audit webhook batch
+    return doc if isinstance(doc, list) else [doc]
+
+
+@ingest_router.post("/ingest/{source}")
+async def ingest_raw(request: Request, source: str = Path(pattern=SOURCE_RE),
+                     host: str | None = Query(None, pattern=HOST_RE), db: Session = Depends(get_db)):
+    """Log-shipper endpoint: raw records of one source, as a JSON array, one object, {"events": [...]} or NDJSON.
+    `host` fills in the hostname for records that don't carry one (Docker events, Kubernetes audit logs)."""
+    records = _parse_body(await request.body())
+    if len(records) > get_settings().max_batch_events:
+        raise HTTPException(413, f"more than MAX_BATCH_EVENTS={get_settings().max_batch_events} records")
+    items = []
+    for r in records:
+        if not isinstance(r, dict):
+            raise HTTPException(422, "every record must be a JSON object")
+        if host:
+            r.setdefault("host", host)
+        items.append(EventIn(source=source, data=r))
+    return await run_in_threadpool(ingest, db, items)
 
 
 @router.post("")

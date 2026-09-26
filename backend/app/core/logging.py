@@ -20,17 +20,7 @@ class _JsonFormatter(logging.Formatter):
         return json.dumps(payload, default=str)
 
 
-class StructLogger:
-    def __init__(self, name: str):
-        self._log = logging.getLogger(name)
-
-    def _emit(self, level: int, event: str, **fields):
-        self._log.log(level, event, extra={"fields": fields})
-
-    def debug(self, event: str, **f): self._emit(logging.DEBUG, event, **f)
-    def info(self, event: str, **f): self._emit(logging.INFO, event, **f)
-    def warning(self, event: str, **f): self._emit(logging.WARNING, event, **f)
-    def error(self, event: str, **f): self._emit(logging.ERROR, event, **f)
+from sentinelforge.log import get_logger  # noqa: E402,F401  (same logger for library + server)
 
 
 def setup_logging(level: str = "INFO") -> None:
@@ -40,7 +30,3 @@ def setup_logging(level: str = "INFO") -> None:
     root.handlers[:] = [handler]
     root.setLevel(level.upper())
     root.propagate = False
-
-
-def get_logger(name: str) -> StructLogger:
-    return StructLogger(f"sentinelforge.{name}")

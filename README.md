@@ -33,6 +33,66 @@ DISCOVER  →  PROFILE  →  GENERATE / SELECT RULES  →  DETECT  →  ENRICH  
 
 ---
 
+## Use SentinelForge in your stack
+
+SentinelForge is an add-on, not a replacement. Pick whichever of these fits:
+
+| You want to… | Use | Start here |
+|---|---|---|
+| Run detections **inside your own Python code or pipeline** | the library: `pip install sentinelforge-detect` | [Library](#library) |
+| **Test your own rule repository in CI** (detection-as-code) | the GitHub Action: `uses: TSecForge/SentinelForge@v0.2.0` | [`examples/rule-repo`](examples/rule-repo) |
+| Put an **environment-aware filter in front of your SIEM** | the server + your existing shipper (Winlogbeat, Fluent Bit, Vector, K8s audit webhook) | [`integrations/`](integrations) |
+| **Explore the whole platform** (discovery, dashboard, demo) | the server + dashboard | [Quick start](#quick-start) |
+
+### Library
+
+```bash
+pip install sentinelforge-detect      # import name: sentinelforge; dependencies: pydantic, PyYAML
+```
+
+```python
+from sentinelforge import Engine
+
+# built-in rules + your own; an inventory makes rule selection environment-aware
+engine = Engine.from_paths(["builtin", "./org-rules"], inventory="web-srv-01.json")
+
+for det in engine.process({"source": "windows", "data": sysmon_or_security_record}):
+    print(det["severity"], det["rule"]["name"], det["mitre"]["technique"])   # sentinelforge.detection.v1
+```
+
+```bash
+sentinelforge evaluate --source windows --inventory host.json events.ndjson > detections.ndjson
+docker events --format '{{json .}}' | sentinelforge forward --url https://sentinelforge:8000 --source docker --host "$(hostname)"
+```
+
+> Until the first PyPI release is published, install from GitHub:
+> `pip install "git+https://github.com/TSecForge/SentinelForge@v0.2.0"`
+
+### GitHub Action
+
+```yaml
+- uses: actions/checkout@v4
+- uses: TSecForge/SentinelForge@v0.2.0
+  with:
+    rules: rules            # your rules
+    tests: rule-tests       # match / no-match cases per rule
+    include-builtin: "true"
+```
+
+This validates your rules, runs their tests, and writes an ATT&CK coverage table to the job summary.
+
+### Log shippers → SentinelForge server
+
+```
+POST /api/v1/ingest/{windows|linux|docker|kubernetes}[?host=NAME]    JSON array · {"events": [...]} · NDJSON · K8s EventList
+```
+
+Ready-made configs: [Winlogbeat → Logstash](integrations/logstash/sentinelforge.conf),
+[Fluent Bit](integrations/fluent-bit/fluent-bit.conf), [Vector](integrations/vector/vector.yaml),
+[Kubernetes audit webhook](integrations/kubernetes), [Docker events](integrations/docker).
+
+---
+
 ## The problem
 
 SIEM pipelines often receive every event from every host and apply one global rule set. Much of that
@@ -153,7 +213,7 @@ Requirements: Python 3.11+, Node.js 20+. Windows is only needed for live discove
 # backend
 cd backend
 python -m venv .venv && . .venv/bin/activate        # Windows: .venv\Scripts\activate
-pip install -r requirements-dev.txt
+pip install -r requirements-dev.txt                  # also installs the library from ../ in editable mode
 uvicorn app.main:app --reload                        # http://127.0.0.1:8000  (API docs: /api/docs)
 ```
 
@@ -196,7 +256,7 @@ docker compose up --build
 7. **Simulate full workload** sends 1,000 benign events plus every scenario relevant to the host. The dashboard then shows
    events received, filtered, detections, forwarded, and the reduction percentage.
 
-The same flow from the CLI: `sentinelforge demo --benign 10000`.
+The same flow from the CLI: `python -m app.cli demo --benign 10000` (from `backend/`; installed as `sentinelforge-server demo`).
 
 Measured on the development machine (SQLite, synthetic workload): 10,051 events received, 21 matched,
 22 detection documents, 99.79% of events not forwarded. Every scenario fired its expected rule and no
@@ -212,7 +272,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File collectors\windows\discovery
 .\collectors\windows\discovery.ps1 -ComputerName WEB-SRV-01 -OutFile web-srv-01.json
 ```
 
-Import the file in the UI (**Environments → Import inventory**), with `sentinelforge discovery --file inventory.json --save`,
+Import the file in the UI (**Environments → Import inventory**), with `sentinelforge-server discovery --file inventory.json --save`,
 or via `POST /api/v1/discovery/run {"mode":"import","inventory":{...}}`.
 The API can also run the collector itself (`mode: local | remote`), but only when `ENABLE_LIVE_DISCOVERY=true`.
 
@@ -255,7 +315,7 @@ Operators: `eq` (default), `contains`, `startswith`, `endswith`, `re`, `not_in`,
 [docs/detection-engine.md](docs/detection-engine.md).
 
 Organization rules go in `custom-rules/`, or any directory listed in `RULE_PATHS`. The core engine does not need to change. Validate them with
-`sentinelforge rules validate`, then reload with **Rules → Reload rule packs**.
+`sentinelforge rules validate builtin custom-rules`, then reload with **Rules → Reload rule packs**.
 
 ### Detection-as-code
 
@@ -328,17 +388,23 @@ POST /api/v1/demo/environment | /demo/simulate | /demo/run | /demo/reset
 
 ## CLI
 
+Two command-line tools:
+
 ```bash
-pip install -e backend        # provides the `sentinelforge` command (or: python -m app.cli from backend/)
-sentinelforge discovery --save                 # live local discovery
-sentinelforge profile --template windows-web-server
-sentinelforge rules validate
-sentinelforge rules test                       # per-rule match / no-match unit tests
-sentinelforge coverage export                  # docs/attack-coverage.md + Navigator layer
-sentinelforge rules generate --file inventory.json
-sentinelforge events simulate --scenario office_powershell
-sentinelforge demo --benign 10000
-sentinelforge schemas export                   # regenerates schemas/*.schema.json
+# library (pip install sentinelforge-detect): no server needed
+sentinelforge rules validate builtin custom-rules
+sentinelforge rules test --rules builtin custom-rules --tests rule-tests --inventory-dir sample-data/environments
+sentinelforge coverage export --rules builtin custom-rules        # docs/attack-coverage.md + Navigator layer
+sentinelforge profile inventory.json
+sentinelforge evaluate --source windows [--inventory host.json] events.ndjson
+sentinelforge forward --url https://sentinelforge:8000 --source docker --host NAME -
+
+# server (backend/, or `python -m app.cli` from backend/)
+sentinelforge-server discovery --save                  # live local discovery
+sentinelforge-server rules generate --file inventory.json
+sentinelforge-server events simulate --scenario office_powershell
+sentinelforge-server demo --benign 10000
+sentinelforge-server schemas export                    # regenerates schemas/*.schema.json
 ```
 
 ## Customization and extension
@@ -413,13 +479,17 @@ outside the execution path, and any rule it proposed would have to pass the same
 ## Repository layout
 
 ```
-backend/            FastAPI app (api/ core/ db/ models/ schemas/ services/), CLI, tests
+src/sentinelforge/  the library (pip: sentinelforge-detect): schemas, rule engine, normalization, profiling, CLI
+action.yml          the GitHub Action (detection-as-code for other repos)
+backend/            the server (FastAPI app, DB, SIEM gateway) built on the library, and all tests
 frontend/           React + Vite + TypeScript + Tailwind dashboard
 collectors/windows/ agentless PowerShell discovery collector
 detection-rules/    built-in rule packs (windows, network, docker, kubernetes, linux)
 custom-rules/       organization/user rule packs (loaded alongside built-ins)
 rule-tests/         per-rule unit tests (match / no-match events), run in CI
 plugins/            example plugin (stdout SIEM adapter, parser, extractor)
+integrations/       Winlogbeat/Logstash, Fluent Bit, Vector, Kubernetes audit webhook, Docker events
+examples/rule-repo/ an example external rule repository tested by the Action
 schemas/            JSON Schemas (inventory, profile, rule, normalized event, detection event)
 sample-data/        synthetic environments, events and an example detection
 docs/               architecture, detection engine, discovery, SIEM, extending, threat model, roadmap
